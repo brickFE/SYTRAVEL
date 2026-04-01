@@ -33,6 +33,7 @@ SYTRAVEL 是一个旅游业务管理系统后端项目，当前基于 **Spring B
 
 - `docs/refactor-plan.md`
 - `docs/platform-upgrade-assessment.md`
+- `docs/test-runbook.md`
 
 ---
 
