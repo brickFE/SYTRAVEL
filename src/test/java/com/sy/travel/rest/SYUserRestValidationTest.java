@@ -60,4 +60,10 @@ public class SYUserRestValidationTest {
 		mockMvc.perform(get("/sy/user/all").param("currentPage", "0"))
 				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
 	}
+
+	@Test
+	public void queryAllShouldReturnBadRequestWhenPageSizeInvalid() throws Exception {
+		mockMvc.perform(get("/sy/user/all").param("pageSize", "0"))
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
+	}
 }

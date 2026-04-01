@@ -45,4 +45,10 @@ public class SYProjectRestValidationTest {
 		mockMvc.perform(get("/sy/project/all").param("currentPage", "0"))
 				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
 	}
+
+	@Test
+	public void allShouldReturnBadRequestWhenPageSizeInvalid() throws Exception {
+		mockMvc.perform(get("/sy/project/all").param("pageSize", "0"))
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
+	}
 }
