@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.sy.travel.common.AjaxResult;
+import com.sy.travel.common.ResultBuilder;
 import com.sy.travel.common.Commons;
 import com.sy.travel.common.DateFormat;
 import com.sy.travel.dao.SYClassesRepository;
@@ -242,6 +243,6 @@ public class SYClassesService implements DateFormat{
 				StringUtils.isBlank(reason) ? operator + operation + ":成功" : operator + operation + "失败原因:" + reason,
 				status, operation);// 记录操作日志
 		syLoggerService.save(logger);
-		return "1".equals(status) ? AjaxResult.success(reason) : AjaxResult.failed(200, reason);
+		return ResultBuilder.byStatus(status, reason);
 	}
 }
