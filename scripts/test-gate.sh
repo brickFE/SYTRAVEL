@@ -8,7 +8,7 @@ run_unit() {
 }
 
 run_validation() {
-  mvn -q -Dtest=SYUserRestValidationTest,SYProjectRestValidationTest,SYTeamRestValidationTest,SYProductRestValidationTest,SYRoleRestValidationTest,SYClassesRestValidationTest test
+  mvn -q -Dtest=SYLoginRestValidationTest,SYUserRestValidationTest,SYProjectRestValidationTest,SYTeamRestValidationTest,SYProductRestValidationTest,SYRoleRestValidationTest,SYClassesRestValidationTest test
 }
 
 run_full() {

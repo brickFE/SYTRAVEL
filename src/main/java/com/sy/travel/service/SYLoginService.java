@@ -8,8 +8,8 @@ import com.sy.travel.common.AjaxResult;
 import com.sy.travel.common.Commons;
 import com.sy.travel.common.PasswordSupport;
 import com.sy.travel.dao.SYUserRepository;
+import com.sy.travel.dto.login.LoginCheckRequest;
 import com.sy.travel.entity.User;
-import com.sy.travel.utils.JSON;
 
 /**
  * 登陆处理
@@ -21,9 +21,9 @@ public class SYLoginService {
 	@Autowired
 	private SYUserRepository syUserRepository;
 	
-	public AjaxResult<String> loginCheck(JSON json) {
-		String username = (String) json.get("username");
-		String password = (String) json.get("password");
+	public AjaxResult<String> loginCheck(LoginCheckRequest request) {
+		String username = request.getUsername();
+		String password = request.getPassword();
 		String reason = "";
 		if(StringUtils.isBlank(username)) {
 			reason = Commons.LOGIN_CHECK_NAME_NOT_NULL;

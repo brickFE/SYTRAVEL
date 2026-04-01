@@ -37,6 +37,7 @@ mvn -q -Dtest=PasswordSupportTest,SYLoginServiceTest,SYUserServiceTest,Permissio
 建议执行：
 
 - `SYUserRestValidationTest`
+- `SYLoginRestValidationTest`
 - `SYProjectRestValidationTest`
 - `SYTeamRestValidationTest`
 - `SYProductRestValidationTest`
@@ -46,7 +47,7 @@ mvn -q -Dtest=PasswordSupportTest,SYLoginServiceTest,SYUserServiceTest,Permissio
 命令示例：
 
 ```bash
-mvn -q -Dtest=SYUserRestValidationTest,SYProjectRestValidationTest,SYTeamRestValidationTest,SYProductRestValidationTest,SYRoleRestValidationTest,SYClassesRestValidationTest test
+mvn -q -Dtest=SYLoginRestValidationTest,SYUserRestValidationTest,SYProjectRestValidationTest,SYTeamRestValidationTest,SYProductRestValidationTest,SYRoleRestValidationTest,SYClassesRestValidationTest test
 ```
 
 统一脚本：

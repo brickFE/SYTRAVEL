@@ -14,8 +14,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import com.sy.travel.common.AjaxResult;
 import com.sy.travel.common.PasswordSupport;
 import com.sy.travel.dao.SYUserRepository;
+import com.sy.travel.dto.login.LoginCheckRequest;
 import com.sy.travel.entity.User;
-import com.sy.travel.utils.JSON;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SYLoginServiceTest {
@@ -31,10 +31,10 @@ public class SYLoginServiceTest {
 		User user = new User("admin", PasswordSupport.legacyEncode("admin", "123456"), "", "0");
 		when(syUserRepository.findByUsername("admin")).thenReturn(user);
 
-		JSON json = new JSON();
-		json.put("username", "admin");
-		json.put("password", "123456");
-		AjaxResult<String> result = syLoginService.loginCheck(json);
+		LoginCheckRequest request = new LoginCheckRequest();
+		request.setUsername("admin");
+		request.setPassword("123456");
+		AjaxResult<String> result = syLoginService.loginCheck(request);
 
 		assertEquals("success", result.getMsg());
 		verify(syUserRepository).save(user);
@@ -45,10 +45,10 @@ public class SYLoginServiceTest {
 		User user = new User("admin", PasswordSupport.hash("123456"), "", "0");
 		when(syUserRepository.findByUsername("admin")).thenReturn(user);
 
-		JSON json = new JSON();
-		json.put("username", "admin");
-		json.put("password", "123456");
-		AjaxResult<String> result = syLoginService.loginCheck(json);
+		LoginCheckRequest request = new LoginCheckRequest();
+		request.setUsername("admin");
+		request.setPassword("123456");
+		AjaxResult<String> result = syLoginService.loginCheck(request);
 
 		assertEquals("success", result.getMsg());
 		verify(syUserRepository, never()).save(user);
