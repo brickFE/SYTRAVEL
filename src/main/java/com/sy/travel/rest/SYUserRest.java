@@ -40,7 +40,7 @@ public class SYUserRest {
 			@RequestParam(defaultValue = "") String name,
 			@RequestParam(defaultValue = "1") int currentPage,
 			@RequestParam(defaultValue = "10") int pageSize) {
-		return new AjaxResult<Map<String,Object>>(200, "success", syUserservice.queryAll(name, currentPage, pageSize));
+		return AjaxResult.success(syUserservice.queryAll(name, currentPage, pageSize));
 	}
 
 	/**
