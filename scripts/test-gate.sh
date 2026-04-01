@@ -2,17 +2,35 @@
 set -euo pipefail
 
 MODE="${1:-smoke}"
+TMP_LOG="$(mktemp)"
+trap 'rm -f "${TMP_LOG}"' EXIT
+
+run_mvn() {
+  local cmd="$*"
+  set +e
+  bash -lc "${cmd}" 2>&1 | tee "${TMP_LOG}"
+  local code=${PIPESTATUS[0]}
+  set -e
+  if [[ ${code} -ne 0 ]]; then
+    if grep -q "status code: 403" "${TMP_LOG}"; then
+      echo "" >&2
+      echo "[test-gate] Maven repository access failed (HTTP 403)." >&2
+      echo "[test-gate] Please switch to a network/mirror that can access required artifacts." >&2
+    fi
+    return "${code}"
+  fi
+}
 
 run_unit() {
-  mvn -q -Dtest=PasswordSupportTest,SYLoginServiceTest,SYUserServiceTest,PermissionGuardTest test
+  run_mvn mvn -q -Dtest=PasswordSupportTest,SYLoginServiceTest,SYUserServiceTest,PermissionGuardTest test
 }
 
 run_validation() {
-  mvn -q -Dtest=SYLoginRestValidationTest,SYUserRestValidationTest,SYProjectRestValidationTest,SYTeamRestValidationTest,SYProductRestValidationTest,SYRoleRestValidationTest,SYClassesRestValidationTest test
+  run_mvn mvn -q -Dtest=SYLoginRestValidationTest,SYUserRestValidationTest,SYProjectRestValidationTest,SYTeamRestValidationTest,SYProductRestValidationTest,SYRoleRestValidationTest,SYClassesRestValidationTest test
 }
 
 run_full() {
-  mvn test
+  run_mvn mvn test
 }
 
 case "${MODE}" in
