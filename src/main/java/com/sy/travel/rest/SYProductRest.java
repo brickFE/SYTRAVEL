@@ -2,7 +2,7 @@ package com.sy.travel.rest;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sy.travel.common.AjaxResult;
+import com.sy.travel.dto.product.ProductCreateRequest;
+import com.sy.travel.dto.product.ProductUpdateRequest;
 import com.sy.travel.service.SYProductService;
-import com.sy.travel.utils.JSON;
 /**
  * 产品模块的接口
  * @author liuxin
@@ -59,15 +60,15 @@ public class SYProductRest {
 	 * 添加产品信息
 	 */
 	@RequestMapping(value = "/add", method = RequestMethod.POST, consumes = "application/json")
-	public AjaxResult<String> add(@RequestBody JSON json, HttpServletRequest request){
-		return syProductService.add(json, request.getRemoteUser());
+	public AjaxResult<String> add(@Valid @RequestBody ProductCreateRequest request){
+		return syProductService.add(request);
 	}
 	
 	/**
 	 * 删除产品信息
 	 */
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
-	public AjaxResult<String> delete(@RequestParam("id") int id, @RequestParam("operator") String operator, HttpServletRequest request){
+	public AjaxResult<String> delete(@RequestParam("id") int id, @RequestParam("operator") String operator){
 		return syProductService.delete(id, operator);
 	}
 	
@@ -75,7 +76,7 @@ public class SYProductRest {
 	 * 修改产品信息
 	 */
 	@RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json")
-	public AjaxResult<String> update(@RequestBody JSON json, HttpServletRequest request){
-		return syProductService.update(json, request.getRemoteUser());
+	public AjaxResult<String> update(@Valid @RequestBody ProductUpdateRequest request){
+		return syProductService.update(request);
 	}
 }

@@ -22,6 +22,8 @@ import com.sy.travel.common.Commons;
 import com.sy.travel.common.DateFormat;
 import com.sy.travel.dao.SYClassesRepository;
 import com.sy.travel.dao.SYProductRepository;
+import com.sy.travel.dto.product.ProductCreateRequest;
+import com.sy.travel.dto.product.ProductUpdateRequest;
 import com.sy.travel.entity.Logger;
 import com.sy.travel.entity.Product;
 import com.sy.travel.utils.JSON;
@@ -127,6 +129,26 @@ public class SYProductService implements DateFormat{
 		}
 		return result(operator, start, reason, "1", Commons.PRODUCT_ADD);
 	}
+
+	public AjaxResult<String> add(ProductCreateRequest request) {
+		JSON json = new JSON();
+		json.put("operator", request.getOperator());
+		json.put("code", request.getCode());
+		json.put("name", request.getName());
+		json.put("teamId", request.getTeamId());
+		json.put("exText", request.getExText());
+		json.put("onlineDate", request.getOnlineDate());
+		json.put("offlineDate", request.getOfflineDate());
+		json.put("classId", request.getClassId());
+		json.put("quantity", request.getQuantity());
+		json.put("minQty", request.getMinQty());
+		json.put("soldQty", request.getSoldQty());
+		json.put("price", request.getPrice());
+		json.put("nights", request.getNights());
+		json.put("status", request.getStatus());
+		json.put("remark", request.getRemark());
+		return add(json, request.getOperator());
+	}
 	
 	/**
 	 * 删除产品信息
@@ -193,6 +215,22 @@ public class SYProductService implements DateFormat{
 			return result(operator, start, reason, "0", Commons.PRODUCT_DELETE);
 		}
 		return result(operator, start, reason, "1", Commons.PRODUCT_DELETE);
+	}
+
+	public AjaxResult<String> update(ProductUpdateRequest request){
+		JSON json = new JSON();
+		json.put("operator", request.getOperator());
+		json.put("id", request.getId());
+		json.put("name", request.getName());
+		json.put("exText", request.getExText());
+		json.put("quantity", request.getQuantity());
+		json.put("minQty", request.getMinQty());
+		json.put("soldQty", request.getSoldQty());
+		json.put("price", request.getPrice());
+		json.put("nights", request.getNights());
+		json.put("status", request.getStatus());
+		json.put("remark", request.getRemark());
+		return update(json, request.getOperator());
 	}
 	
 	/**

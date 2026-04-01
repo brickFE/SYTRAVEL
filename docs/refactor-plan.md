@@ -137,6 +137,7 @@
 - [ ] 其余模块（项目/团队/产品/分类/角色）的 DTO 化与参数校验改造
 - [x] 项目模块已落地 DTO 化入口：`/sy/project/add` + `/sy/project/update`（`ProjectCreateRequest` / `ProjectUpdateRequest` + `@Valid`）
 - [x] 团队模块已落地 DTO 化入口：`/sy/team/add` + `/sy/team/update`（`TeamCreateRequest` / `TeamUpdateRequest` + `@Valid`）
+- [x] 产品模块已落地 DTO 化入口：`/sy/product/add` + `/sy/product/update`（`ProductCreateRequest` / `ProductUpdateRequest` + `@Valid`）
 - [ ] Service 层重复模板（日志记录+结果返回）抽取公共组件
 
 ### 待开始
