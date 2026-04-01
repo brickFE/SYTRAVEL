@@ -140,7 +140,7 @@
 - [x] 产品模块已落地 DTO 化入口：`/sy/product/add` + `/sy/product/update`（`ProductCreateRequest` / `ProductUpdateRequest` + `@Valid`）
 - [x] 分类模块已落地 DTO 化入口：`/sy/classes/add` + `/sy/classes/update`（`ClassesCreateRequest` / `ClassesUpdateRequest` + `@Valid`）
 - [x] 角色模块已落地 DTO 化入口：`/sy/role/add` + `/sy/role/update`（`RoleCreateRequest` / `RoleUpdateRequest` + `@Valid`）
-- [ ] Service 层重复模板（日志记录+结果返回）抽取公共组件
+- [x] Service 层重复模板（日志记录+结果返回）抽取公共组件
 
 ### 待开始
 

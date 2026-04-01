@@ -16,14 +16,13 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.sy.travel.common.AjaxResult;
-import com.sy.travel.common.ResultBuilder;
 import com.sy.travel.common.Commons;
 import com.sy.travel.common.DateFormat;
 import com.sy.travel.dao.SYClassesRepository;
 import com.sy.travel.dto.classes.ClassesCreateRequest;
 import com.sy.travel.dto.classes.ClassesUpdateRequest;
 import com.sy.travel.entity.Classes;
-import com.sy.travel.entity.Logger;
+import com.sy.travel.service.support.OperationResultSupport;
 import com.sy.travel.utils.JSON;
 /**
  * 分类信息的服务层处理
@@ -262,8 +261,6 @@ public class SYClassesService implements DateFormat{
 	 * @return
 	 */
 	private AjaxResult<String> result(String operator, Date start, String reason, String status, String operation) {
-		Logger logger = ResultBuilder.operationLogger(operator, start, reason, status, operation);// 记录操作日志
-		syLoggerService.save(logger);
-		return ResultBuilder.byStatus(status, reason);
+		return OperationResultSupport.build(syLoggerService, operator, start, reason, status, operation);
 	}
 }
