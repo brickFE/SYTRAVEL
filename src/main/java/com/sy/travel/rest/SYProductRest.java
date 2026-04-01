@@ -47,16 +47,16 @@ public class SYProductRest {
 	 * 点击团队时查看这个团队下的产品信息
 	 */
 	@RequestMapping(value =  "/teamid", method = RequestMethod.GET)
-	public AjaxResult<Map<String, Object>> queryByTeamId(@RequestParam("id") String id){
-		return AjaxResult.success(syProductService.findByTeamId(id));
+	public AjaxResult<Map<String, Object>> queryByTeamId(@RequestParam("id") @Min(1) Integer id){
+		return AjaxResult.success(syProductService.findByTeamId(String.valueOf(id)));
 	}
 	
 	/**
 	 * 点击团队时查看这个团队下的产品信息
 	 */
 	@RequestMapping(value =  "/classid", method = RequestMethod.GET)
-	public AjaxResult<Map<String, Object>> queryByClassesId(@RequestParam("id") String id){
-		return AjaxResult.success(syProductService.findByClassId(id));
+	public AjaxResult<Map<String, Object>> queryByClassesId(@RequestParam("id") @Min(1) Integer id){
+		return AjaxResult.success(syProductService.findByClassId(String.valueOf(id)));
 	}
 	
 	/**

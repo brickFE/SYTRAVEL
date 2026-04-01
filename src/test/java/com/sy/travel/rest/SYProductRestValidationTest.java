@@ -57,4 +57,16 @@ public class SYProductRestValidationTest {
 		mockMvc.perform(get("/sy/product/delete").param("id", "0").param("operator", "admin"))
 				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
 	}
+
+	@Test
+	public void queryByTeamIdShouldReturnBadRequestWhenIdInvalid() throws Exception {
+		mockMvc.perform(get("/sy/product/teamid").param("id", "0"))
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
+	}
+
+	@Test
+	public void queryByClassIdShouldReturnBadRequestWhenIdInvalid() throws Exception {
+		mockMvc.perform(get("/sy/product/classid").param("id", "0"))
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
+	}
 }

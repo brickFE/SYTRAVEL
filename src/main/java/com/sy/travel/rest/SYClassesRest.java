@@ -69,7 +69,7 @@ public class SYClassesRest {
 	 * 查看这个分类下的产品信息
 	 */
 	@RequestMapping(value = "/info", method = RequestMethod.GET)
-	public AjaxResult<Map<String, Object>> info(@RequestParam("id") String id){
-		return AjaxResult.success(syClassesService.info(id));
+	public AjaxResult<Map<String, Object>> info(@RequestParam("id") @Min(1) Integer id){
+		return AjaxResult.success(syClassesService.info(String.valueOf(id)));
 	}
 }
