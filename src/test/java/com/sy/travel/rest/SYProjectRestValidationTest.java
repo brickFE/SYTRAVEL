@@ -31,4 +31,11 @@ public class SYProjectRestValidationTest {
 		mockMvc.perform(post("/sy/project/add").contentType(MediaType.APPLICATION_JSON).content(body))
 				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
 	}
+
+	@Test
+	public void updateShouldReturnBadRequestWhenIdMissing() throws Exception {
+		String body = "{\"operator\":\"admin\"}";
+		mockMvc.perform(post("/sy/project/update").contentType(MediaType.APPLICATION_JSON).content(body))
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
+	}
 }

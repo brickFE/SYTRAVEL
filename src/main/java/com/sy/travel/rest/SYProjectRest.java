@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sy.travel.common.AjaxResult;
 import com.sy.travel.dto.project.ProjectCreateRequest;
+import com.sy.travel.dto.project.ProjectUpdateRequest;
 import com.sy.travel.service.SYProjectService;
-import com.sy.travel.utils.JSON;
 
 /**
  * 项目模块的接口
@@ -84,7 +84,7 @@ public class SYProjectRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json")
-	public AjaxResult<String> update(@RequestBody JSON json){
-		return syProjectService.update(json, (String) json.get("operator"));
+	public AjaxResult<String> update(@Valid @RequestBody ProjectUpdateRequest request){
+		return syProjectService.update(request);
 	}
 }

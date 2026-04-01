@@ -21,6 +21,7 @@ import com.sy.travel.common.Commons;
 import com.sy.travel.common.DateFormat;
 import com.sy.travel.dao.SYProjectRepository;
 import com.sy.travel.dto.project.ProjectCreateRequest;
+import com.sy.travel.dto.project.ProjectUpdateRequest;
 import com.sy.travel.entity.Logger;
 import com.sy.travel.entity.Project;
 import com.sy.travel.utils.JSON;
@@ -295,6 +296,19 @@ public class SYProjectService implements DateFormat{
 			return result(operator, start, reason, "0", Commons.PROJECT_UPDATE);
 		}
 		return result(operator, start, reason, "1", Commons.PROJECT_UPDATE);
+	}
+
+	public AjaxResult<String> update(ProjectUpdateRequest request) {
+		JSON json = new JSON();
+		json.put("operator", request.getOperator());
+		json.put("id", request.getId() == null ? null : String.valueOf(request.getId()));
+		json.put("code", request.getCode());
+		json.put("name", request.getName());
+		json.put("beginDate", request.getBeginDate());
+		json.put("endDate", request.getEndDate());
+		json.put("valid", request.getValid());
+		json.put("remark", request.getRemark());
+		return update(json, request.getOperator());
 	}
 
 	/**
