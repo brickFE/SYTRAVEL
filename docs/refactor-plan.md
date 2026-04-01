@@ -117,3 +117,28 @@
 3. 落地全局异常处理和统一错误响应。  
 
 完成后你确认效果，我们再进入第二迭代（密码与鉴权改造）。
+
+## 7. 当前重构进度（滚动更新）
+
+> 更新时间：2026-04-01
+
+### 已完成
+
+- [x] 用户模块 REST 入参 DTO 化（新增 `UserCreateRequest` / `UserUpdateRequest` / `UserAdminPwdUpdateRequest`）
+- [x] 用户模块 `@Valid` 参数校验接入
+- [x] 全局参数校验异常处理（`GlobalExceptionHandler`）
+- [x] `AjaxResult` 工厂方法落地（`success` / `failed` / `validationError` / `internalError`）
+- [x] 用户模块服务层移除动态 JSON 入参依赖（改为 DTO）
+- [x] 多个 Service/Rest 返回构造统一迁移到 `AjaxResult` 工厂方法
+- [x] 用户模块基础单元/接口测试补齐（`SYUserServiceTest` / `SYUserRestValidationTest`）
+
+### 进行中
+
+- [ ] 其余模块（项目/团队/产品/分类/角色）的 DTO 化与参数校验改造
+- [ ] Service 层重复模板（日志记录+结果返回）抽取公共组件
+
+### 待开始
+
+- [ ] 密码存储从 Base64 迁移到 BCrypt/Argon2（含平滑迁移策略）
+- [ ] 鉴权与角色控制体系梳理（接口级权限约束）
+- [ ] 平台升级（Spring Boot 1.5.x -> 2.7.x/3.x 评估，JDK 8 -> 17）
