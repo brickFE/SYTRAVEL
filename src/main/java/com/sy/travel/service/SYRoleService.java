@@ -233,6 +233,6 @@ public class SYRoleService implements DateFormat{
 				StringUtils.isBlank(reason) ? operator + operation + ":成功" : operator + operation + "失败原因:" + reason,
 				status, operation);// 记录操作日志
 		syLoggerService.save(logger);
-		return new AjaxResult<String>(200, "1".equals(status) ? "success" : "failed", reason);
+		return "1".equals(status) ? AjaxResult.success(reason) : AjaxResult.failed(200, reason);
 	}
 }

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.sy.travel.common.AjaxResult;
+import com.sy.travel.common.ApiMessages;
 import com.sy.travel.common.Commons;
 import com.sy.travel.dao.SYUserRepository;
 import com.sy.travel.entity.User;
@@ -26,25 +27,28 @@ public class SYLoginService {
 		String reason = "";
 		if(StringUtils.isBlank(username)) {
 			reason = Commons.LOGIN_CHECK_NAME_NOT_NULL;
-			return returnResult("failed", reason);
+			return returnResult(ApiMessages.FAILED, reason);
 		}
 		if(StringUtils.isBlank(password)) {
 			reason = Commons.LOGIN_CHECK_PWD_NOT_NULl;
-			return returnResult("failed", reason);
+			return returnResult(ApiMessages.FAILED, reason);
 		}
 		User user = syUserRepository.findByUsername(username);
 		if(user == null) {
 			reason = Commons.LOGIN_CHECK_NAME_NOT_EXISTS;
-			return returnResult("failed", reason);
+			return returnResult(ApiMessages.FAILED, reason);
 		}
 		if(!password.equals(user.getPassword())) {
 			reason = Commons.LOGIN_CHECK_PWD_ERROR;
-			return returnResult("failed", reason);
+			return returnResult(ApiMessages.FAILED, reason);
 		}
-		return returnResult("success",user.getPermission());
+		return returnResult(ApiMessages.SUCCESS,user.getPermission());
 	}
 	
 	private AjaxResult<String> returnResult(String result, String reason) {
-		return new AjaxResult<String>(200, result, reason);
+		if (ApiMessages.SUCCESS.equals(result)) {
+			return AjaxResult.success(reason);
+		}
+		return AjaxResult.failed(200, reason);
 	}
 }

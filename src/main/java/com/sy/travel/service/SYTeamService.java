@@ -320,10 +320,10 @@ public class SYTeamService implements DateFormat{
 		Map<String, Object> temp = syProductService.findByTeamId(String.valueOf(id));
 		int totalP = (int) temp.get("total");
 		if (totalP == 0) {
-			return new AjaxResult<List<Map<String,Object>>>(200, "success", new ArrayList<>());
+			return AjaxResult.success(new ArrayList<>());
 		}
 		List<Map<String, Object>> list = (List<Map<String, Object>>) temp.get("documents");
-		return new AjaxResult<List<Map<String,Object>>>(200, "success", list);
+		return AjaxResult.success(list);
 	}
 
 	/**
@@ -346,6 +346,6 @@ public class SYTeamService implements DateFormat{
 				StringUtils.isBlank(reason) ? operator + operation + ":成功" : operator + operation + "失败原因:" + reason,
 				status, operation);// 记录操作日志
 		syLoggerService.save(logger);
-		return new AjaxResult<String>(200, "1".equals(status) ? "success" : "failed", reason);
+		return "1".equals(status) ? AjaxResult.success(reason) : AjaxResult.failed(200, reason);
 	}
 }

@@ -20,6 +20,14 @@ public class AjaxResult<T> {
 		this.data = data;
 	}
 
+	public static <T> AjaxResult<T> success(T data) {
+		return new AjaxResult<T>(200, ApiMessages.SUCCESS, data);
+	}
+
+	public static <T> AjaxResult<T> failed(int code, T data) {
+		return new AjaxResult<T>(code, ApiMessages.FAILED, data);
+	}
+
 	public int getCode() {
 		return code;
 	}

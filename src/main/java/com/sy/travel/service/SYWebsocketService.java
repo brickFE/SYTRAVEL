@@ -86,6 +86,6 @@ public class SYWebsocketService {
 		} else {
 			resultMap.put("product", (List<Map<String,Object>>)productMap.get("documents"));
 		}
-		return new AjaxResult<Map<String,Object>>(200, "success", resultMap);
+		return AjaxResult.success(resultMap);
 	}
 }

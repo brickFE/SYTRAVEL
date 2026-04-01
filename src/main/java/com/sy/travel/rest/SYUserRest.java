@@ -2,7 +2,7 @@ package com.sy.travel.rest;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sy.travel.common.AjaxResult;
+import com.sy.travel.dto.user.UserAdminPwdUpdateRequest;
+import com.sy.travel.dto.user.UserCreateRequest;
+import com.sy.travel.dto.user.UserUpdateRequest;
 import com.sy.travel.service.SYUserService;
-import com.sy.travel.utils.JSON;
 
 /**
  * 用户模块接口
@@ -43,49 +45,36 @@ public class SYUserRest {
 
 	/**
 	 * 添加用户信息
-	 * 
-	 * @param json
-	 * @param request
-	 * @return
 	 */
 	@RequestMapping(value = "/add", method = RequestMethod.POST, consumes = "application/json")
-	public AjaxResult<String> add(@RequestBody JSON json, HttpServletRequest request) {
-		return syUserservice.add(json, request.getRemoteUser());
+	public AjaxResult<String> add(@Valid @RequestBody UserCreateRequest request) {
+		return syUserservice.add(request);
 	}
 
 	/**
 	 * 删除用户信息
-	 * @param id
-	 * @param operator
-	 * @param request
-	 * @return
 	 */
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
-	public AjaxResult<String> delete(@RequestParam("id") int id, @RequestParam("operator") String operator,
-			HttpServletRequest request) {
+	public AjaxResult<String> delete(@RequestParam("id") int id, @RequestParam("operator") String operator) {
 		return syUserservice.delete(id, operator);
 	}
 
 	/**
 	 * 修改用户信息
-	 * @param json
-	 * @param request
-	 * @return
 	 */
 	@RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json")
-	public AjaxResult<String> update(@RequestBody JSON json, HttpServletRequest request){
-		return syUserservice.update(json, request.getRemoteUser());
+	public AjaxResult<String> update(@Valid @RequestBody UserUpdateRequest request){
+		return syUserservice.update(request);
 	}
 	
 	/**
 	 * 修改超级管理员密码
 	 * @param json
-	 * @param request
 	 * @return
 	 */
 	@RequestMapping(value = "/adminpwd", method = RequestMethod.POST, consumes = "application/json")
-	public AjaxResult<String> updatePwd(@RequestBody JSON json, HttpServletRequest request){
-		return syUserservice.updateAdminPwd(json, request.getRemoteUser());
+	public AjaxResult<String> updatePwd(@Valid @RequestBody UserAdminPwdUpdateRequest request){
+		return syUserservice.updateAdminPwd(request);
 	}
 	
 	/**
