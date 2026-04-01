@@ -23,6 +23,7 @@ import com.sy.travel.dto.role.RoleCreateRequest;
 import com.sy.travel.dto.role.RoleUpdateRequest;
 import com.sy.travel.entity.Role;
 import com.sy.travel.service.support.OperationResultSupport;
+import com.sy.travel.service.support.PermissionGuard;
 import com.sy.travel.utils.JSON;
 
 /**
@@ -39,6 +40,8 @@ public class SYRoleService implements DateFormat{
 	private SYTeamService syTeamService;
 	@Autowired
 	private SYLoggerService syLoggerService;
+	@Autowired
+	private PermissionGuard permissionGuard;
 
 	/**
 	 * 添加角色信息
@@ -50,6 +53,10 @@ public class SYRoleService implements DateFormat{
 		operator = (String) json.get("operator");
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.ROLE_ADD);
+		}
 		String name = (String) json.get("name");
 		if(StringUtils.isBlank(name)) {
 			reason = Commons.ROLE_ADD_NAME_NOT_NULL;
@@ -124,6 +131,10 @@ public class SYRoleService implements DateFormat{
 	public AjaxResult<String> delete(int id, String operator){
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.ROLE_DELETE);
+		}
 		try {
 			syRoleRepository.delete(id);
 			return result(operator, start, reason, "1", Commons.ROLE_DELETE);
@@ -143,6 +154,10 @@ public class SYRoleService implements DateFormat{
 		operator = (String) json.get("operator");
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.ROLE_UPDATE);
+		}
 		if(StringUtils.isBlank((String)json.get("id"))) {
 			reason = Commons.ROLE_ADD_TEAMID_NOT_NULL;
 			return result(operator, start, reason, "0", Commons.ROLE_UPDATE);

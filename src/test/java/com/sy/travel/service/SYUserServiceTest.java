@@ -16,6 +16,7 @@ import com.sy.travel.dao.SYUserRepository;
 import com.sy.travel.dto.user.UserCreateRequest;
 import com.sy.travel.dto.user.UserUpdateRequest;
 import com.sy.travel.entity.User;
+import com.sy.travel.service.support.PermissionGuard;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SYUserServiceTest {
@@ -25,6 +26,8 @@ public class SYUserServiceTest {
 
 	@Mock
 	private SYLoggerService syLoggerService;
+	@Mock
+	private PermissionGuard permissionGuard;
 
 	@InjectMocks
 	private SYUserService syUserService;
@@ -36,6 +39,7 @@ public class SYUserServiceTest {
 		request.setUsername(" ");
 		request.setPassword("123456");
 		request.setPermission("0");
+		when(permissionGuard.requireAdmin("admin")).thenReturn("");
 
 		AjaxResult<String> result = syUserService.add(request);
 
@@ -48,6 +52,7 @@ public class SYUserServiceTest {
 		UserUpdateRequest request = new UserUpdateRequest();
 		request.setOperator("admin");
 		request.setId(99);
+		when(permissionGuard.requireAdmin("admin")).thenReturn("");
 		when(syUserRepository.findOne(99)).thenReturn(null);
 
 		AjaxResult<String> result = syUserService.update(request);

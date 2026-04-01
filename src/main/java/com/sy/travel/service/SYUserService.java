@@ -25,6 +25,7 @@ import com.sy.travel.dto.user.UserCreateRequest;
 import com.sy.travel.dto.user.UserUpdateRequest;
 import com.sy.travel.entity.User;
 import com.sy.travel.service.support.OperationResultSupport;
+import com.sy.travel.service.support.PermissionGuard;
 
 
 /**
@@ -38,6 +39,8 @@ public class SYUserService implements DateFormat{
 	private SYUserRepository syUserRepository;
 	@Autowired
 	private SYLoggerService syLoggerService;
+	@Autowired
+	private PermissionGuard permissionGuard;
 	/**
 	 * 添加用户信息
 	 * @param json
@@ -48,6 +51,10 @@ public class SYUserService implements DateFormat{
 		String operator = request.getOperator();
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.USER_ADD);
+		}
 		String username = request.getUsername();
 		if(StringUtils.isBlank(username)) {
 			reason = Commons.USER_ADD_USRENAME_NOT_NULL;
@@ -87,6 +94,10 @@ public class SYUserService implements DateFormat{
 	public AjaxResult<String> delete(int id, String operator){
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.USER_DELETE);
+		}
 		try {
 			syUserRepository.delete(id);
 			return result(operator, start, reason, "1", Commons.USER_DELETE);
@@ -120,6 +131,10 @@ public class SYUserService implements DateFormat{
 		String operator = request.getOperator();
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.USER_UPDATE);
+		}
 		Integer id = request.getId();
 		if(id == null) {
 			reason = Commons.USER_UPDATE_NOT_FOUND;
@@ -164,8 +179,8 @@ public class SYUserService implements DateFormat{
 		String operator = request.getOperator();
 		Date start = new Date();
 		String reason = "";
-		if(!"admin".equals(operator)) {
-			reason = Commons.USER_UPDATE_PWD_NOT_PERMISSION;
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
 			return result(operator, start, reason, "0", Commons.USER_UPDATE_PWD);
 		}
 		User uTemp = syUserRepository.findByUsername("admin");

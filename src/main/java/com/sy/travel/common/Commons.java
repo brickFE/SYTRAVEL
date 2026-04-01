@@ -111,6 +111,8 @@ public class Commons {
 	public final static String USER_UPDTE_PWD = "修改超级管理员密码";
 	public final static String USER_UPDATE_PWD = "修改超级管理员密码";
 	public final static String USER_UPDATE_PWD_NOT_PERMISSION = "只有超级管理员才有修改密码的权限";
+	public final static String USER_OPERATOR_NOT_EXISTS = "操作用户不存在";
+	public final static String USER_OPERATOR_NOT_PERMISSION = "当前用户没有操作权限";
 	public final static String USER_NOT_LOGIN = "用户未登录";
 	public final static String USER_ADMIN_OLD_PASSWORD_EMPTY = "超级管理员原密码不能为空";
 	public final static String USER_ADMIN_OLD_PASSWORD_ERROR = "超级管理员原密码输入错误";
