@@ -36,7 +36,7 @@ public class SYProductRest {
 			@RequestParam(defaultValue = "") String name,
 			@RequestParam(defaultValue = "1") int currentPage,
 			@RequestParam(defaultValue = "10") int pageSize) {
-		return new AjaxResult<Map<String, Object>>(200,"success", syProductService.findAll(name, currentPage, pageSize));
+		return AjaxResult.success(syProductService.findAll(name, currentPage, pageSize));
 	}
 	
 	/**
@@ -44,7 +44,7 @@ public class SYProductRest {
 	 */
 	@RequestMapping(value =  "/teamid", method = RequestMethod.GET)
 	public AjaxResult<Map<String, Object>> queryByTeamId(@RequestParam("id") String id){
-		return new AjaxResult<Map<String, Object>>(200,"success", syProductService.findByTeamId(id));
+		return AjaxResult.success(syProductService.findByTeamId(id));
 	}
 	
 	/**
@@ -52,7 +52,7 @@ public class SYProductRest {
 	 */
 	@RequestMapping(value =  "/classid", method = RequestMethod.GET)
 	public AjaxResult<Map<String, Object>> queryByClassesId(@RequestParam("id") String id){
-		return new AjaxResult<Map<String, Object>>(200,"success", syProductService.findByClassId(id));
+		return AjaxResult.success(syProductService.findByClassId(id));
 	}
 	
 	/**

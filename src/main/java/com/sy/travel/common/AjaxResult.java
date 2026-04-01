@@ -28,6 +28,14 @@ public class AjaxResult<T> {
 		return new AjaxResult<T>(code, ApiMessages.FAILED, data);
 	}
 
+	public static AjaxResult<String> validationError(String message) {
+		return new AjaxResult<String>(400, ErrorCodes.VALIDATION_ERROR, message);
+	}
+
+	public static AjaxResult<String> internalError(String message) {
+		return new AjaxResult<String>(500, ErrorCodes.INTERNAL_ERROR, message);
+	}
+
 	public int getCode() {
 		return code;
 	}

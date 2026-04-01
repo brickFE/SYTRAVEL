@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.sy.travel.common.AjaxResult;
-import com.sy.travel.common.ErrorCodes;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -21,13 +20,13 @@ public class GlobalExceptionHandler {
 	public AjaxResult<String> handleValidation(MethodArgumentNotValidException ex) {
 		String message = ex.getBindingResult().getFieldErrors().stream().map(fieldError -> fieldError.getDefaultMessage())
 				.collect(Collectors.joining(";"));
-		return new AjaxResult<String>(400, ErrorCodes.VALIDATION_ERROR, message);
+		return AjaxResult.validationError(message);
 	}
 
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	@ResponseBody
 	public AjaxResult<String> handleUnexpected(Exception ex) {
-		return new AjaxResult<String>(500, ErrorCodes.INTERNAL_ERROR, ex.getMessage());
+		return AjaxResult.internalError(ex.getMessage());
 	}
 }
