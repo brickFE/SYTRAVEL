@@ -23,6 +23,8 @@ import com.sy.travel.dao.SYProductRepository;
 import com.sy.travel.dao.SYProjectRepository;
 import com.sy.travel.dao.SYRoleRepository;
 import com.sy.travel.dao.SYTeamRepository;
+import com.sy.travel.dto.team.TeamCreateRequest;
+import com.sy.travel.dto.team.TeamUpdateRequest;
 import com.sy.travel.entity.Logger;
 import com.sy.travel.entity.Product;
 import com.sy.travel.entity.Project;
@@ -168,6 +170,16 @@ public class SYTeamService implements DateFormat{
 		return result(operator, start, reason, "1", Commons.TEAM_ADD);
 	}
 
+	public AjaxResult<String> add(TeamCreateRequest request) {
+		JSON json = new JSON();
+		json.put("operator", request.getOperator());
+		json.put("name", request.getName());
+		json.put("projectId", request.getProjectId());
+		json.put("valid", request.getValid());
+		json.put("remark", request.getRemark());
+		return add(json, request.getOperator());
+	}
+
 	public Map<String, Object> queryByProjectId(String projectId) {
 		Map<String, Object> resultMap = new HashMap<>();
 		if (StringUtils.isBlank(projectId)) {
@@ -309,6 +321,17 @@ public class SYTeamService implements DateFormat{
 			updateValidById(id);
 		}
 		return result(operator, start, reason, "1", Commons.TEAM_UPDATE);
+	}
+
+	public AjaxResult<String> update(TeamUpdateRequest request) {
+		JSON json = new JSON();
+		json.put("operator", request.getOperator());
+		json.put("id", request.getId() == null ? null : String.valueOf(request.getId()));
+		json.put("name", request.getName());
+		json.put("projectId", request.getProjectId());
+		json.put("valid", request.getValid());
+		json.put("remark", request.getRemark());
+		return update(json, request.getOperator());
 	}
 	
 	/**

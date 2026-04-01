@@ -3,7 +3,7 @@ package com.sy.travel.rest;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -14,8 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sy.travel.common.AjaxResult;
+import com.sy.travel.dto.team.TeamCreateRequest;
+import com.sy.travel.dto.team.TeamUpdateRequest;
 import com.sy.travel.service.SYTeamService;
-import com.sy.travel.utils.JSON;
 
 /**
  * 团队管理接口： 查看所有团队信息、
@@ -50,8 +51,8 @@ public class SYTeamRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/add", method = RequestMethod.POST, consumes = "application/json")
-	public AjaxResult<String> add(@RequestBody JSON json, HttpServletRequest request) {
-		return syTeamService.add(json, request.getRemoteUser());
+	public AjaxResult<String> add(@Valid @RequestBody TeamCreateRequest request) {
+		return syTeamService.add(request);
 	}
 
 	/**
@@ -85,7 +86,7 @@ public class SYTeamRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
-	public AjaxResult<String> deleteByTeamId(@RequestParam("id") Integer id, @RequestParam("operator") String operator, HttpServletRequest request) {
+	public AjaxResult<String> deleteByTeamId(@RequestParam("id") Integer id, @RequestParam("operator") String operator) {
 		return syTeamService.deleteByTeamId(id, operator);
 	}
 	/**
@@ -95,7 +96,7 @@ public class SYTeamRest {
 	 * @return
 	 */
 	@RequestMapping(value="/update", method = RequestMethod.POST, consumes = "application/json")
-	public AjaxResult<String> update(@RequestBody JSON json, HttpServletRequest request) {
-		return syTeamService.update(json, request.getRemoteUser());
+	public AjaxResult<String> update(@Valid @RequestBody TeamUpdateRequest request) {
+		return syTeamService.update(request);
 	}
 }
