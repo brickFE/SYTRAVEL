@@ -39,7 +39,7 @@ public class SYTeamRest {
 			@RequestParam(defaultValue = "") String name,
 			@RequestParam(defaultValue = "1") int currentPage,
 			@RequestParam(defaultValue = "5") int pageSize) {
-		return new AjaxResult<Map<String, Object>>(200, "success", syTeamService.findAll(name,currentPage,pageSize));
+		return AjaxResult.success(syTeamService.findAll(name,currentPage,pageSize));
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class SYTeamRest {
 	@RequestMapping(value = "/allbypid", method = RequestMethod.GET)
 	public AjaxResult<Map<String, Object>> findAllByProjectId(@RequestParam(defaultValue = "") String projectId) {
 		Map<String, Object> data = syTeamService.queryByProjectId(projectId);
-		return new AjaxResult<Map<String, Object>>(200, "success", data);
+		return AjaxResult.success(data);
 	}
 
 	/**

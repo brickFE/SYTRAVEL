@@ -34,7 +34,7 @@ public class SYClassesRest {
 			@RequestParam(defaultValue = "") String name,
 			@RequestParam(defaultValue = "1") int currentPage,
 			@RequestParam(defaultValue = "10") int pageSize){
-		return new AjaxResult<Map<String,Object>>(200, "success", syClassesService.queryAll(name, currentPage, pageSize));
+		return AjaxResult.success(syClassesService.queryAll(name, currentPage, pageSize));
 	}
 	
 	/**
@@ -66,6 +66,6 @@ public class SYClassesRest {
 	 */
 	@RequestMapping(value = "/info", method = RequestMethod.GET)
 	public AjaxResult<Map<String, Object>> info(@RequestParam("id") String id){
-		return new AjaxResult<Map<String,Object>>(200, "success", syClassesService.info(id));
+		return AjaxResult.success(syClassesService.info(id));
 	}
 }

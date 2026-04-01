@@ -43,7 +43,7 @@ public class SYProjectRest {
 			@RequestParam(defaultValue = "10") int pageSize
 			) {
 		Map<String, Object> data = syProjectService.queryAll(name, currentPage, pageSize);
-		return new AjaxResult<Map<String, Object>>(200, "success", data);
+		return AjaxResult.success(data);
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class SYProjectRest {
 	 */
 	@RequestMapping(value = "/info", method = RequestMethod.GET)
 	public AjaxResult<Map<String, Object>> info(@RequestParam(defaultValue = "0") Integer id) {
-		return new AjaxResult<Map<String, Object>>(200, "success", syProjectService.info(id));
+		return AjaxResult.success(syProjectService.info(id));
 	}
 	/**
 	 * 添加项目信息的接口

@@ -22,7 +22,7 @@ public class SYUploadRest {
 		}
 		try {
 			FileUtils.writeByteArrayToFile(new File("D:\\upload\\" + file.getOriginalFilename()), file.getBytes());
-			return new AjaxResult<String>(200, "success", "ok");
+			return AjaxResult.success("ok");
 		} catch (IOException e) {
 			e.printStackTrace();
 			return new AjaxResult<String>(500, "failed", "failed");

@@ -31,6 +31,6 @@ public class SYLoggerRest {
 			@RequestParam(defaultValue = "1") int currentPage,
 			@RequestParam(defaultValue = "10") int pageSize
 			){
-		return new AjaxResult<Map<String, Object>>(200, "success", syLoggerService.all(currentPage, pageSize));
+		return AjaxResult.success(syLoggerService.all(currentPage, pageSize));
 	}
 }

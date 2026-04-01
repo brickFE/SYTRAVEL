@@ -40,7 +40,7 @@ public class SYRoleRest {
 			@RequestParam(defaultValue = "") String teamId,
 			@RequestParam(defaultValue = "1") int currentPage,
 			@RequestParam(defaultValue = "10") int pageSize) {
-		return new AjaxResult<Map<String,Object>>(200, "success", syRoleService.queryAll(teamId, currentPage, pageSize));
+		return AjaxResult.success(syRoleService.queryAll(teamId, currentPage, pageSize));
 	}
 
 	/**
