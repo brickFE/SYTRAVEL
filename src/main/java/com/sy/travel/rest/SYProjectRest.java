@@ -2,7 +2,7 @@ package com.sy.travel.rest;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sy.travel.common.AjaxResult;
+import com.sy.travel.dto.project.ProjectCreateRequest;
 import com.sy.travel.service.SYProjectService;
 import com.sy.travel.utils.JSON;
 
@@ -62,8 +63,8 @@ public class SYProjectRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/add", method = RequestMethod.POST, consumes = "application/json")
-	public AjaxResult<String> add(@RequestBody JSON json, HttpServletRequest request) {
-		return syProjectService.add(json, request.getRemoteUser());
+	public AjaxResult<String> add(@Valid @RequestBody ProjectCreateRequest request) {
+		return syProjectService.add(request);
 	}
 	
 	/**
@@ -72,7 +73,7 @@ public class SYProjectRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
-	public AjaxResult<String> delete(@RequestParam("id") Integer id, @RequestParam("operator") String operator, HttpServletRequest request){
+	public AjaxResult<String> delete(@RequestParam("id") Integer id, @RequestParam("operator") String operator){
 		return syProjectService.deleteById(id, operator);
 	}
 	
@@ -83,7 +84,7 @@ public class SYProjectRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json")
-	public AjaxResult<String> update(@RequestBody JSON json, HttpServletRequest request){
-		return syProjectService.update(json, request.getRemoteUser());
+	public AjaxResult<String> update(@RequestBody JSON json){
+		return syProjectService.update(json, (String) json.get("operator"));
 	}
 }

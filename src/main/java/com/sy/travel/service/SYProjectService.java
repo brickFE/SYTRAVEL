@@ -20,6 +20,7 @@ import com.sy.travel.common.ResultBuilder;
 import com.sy.travel.common.Commons;
 import com.sy.travel.common.DateFormat;
 import com.sy.travel.dao.SYProjectRepository;
+import com.sy.travel.dto.project.ProjectCreateRequest;
 import com.sy.travel.entity.Logger;
 import com.sy.travel.entity.Project;
 import com.sy.travel.utils.JSON;
@@ -129,6 +130,18 @@ public class SYProjectService implements DateFormat{
 		}
 		// 当成功添加项目后，reason为""
 		return result(operator, start, reason, "1", Commons.PROJECT_ADD);
+	}
+
+	public AjaxResult<String> add(ProjectCreateRequest request) {
+		JSON json = new JSON();
+		json.put("operator", request.getOperator());
+		json.put("code", request.getCode());
+		json.put("name", request.getName());
+		json.put("beginDate", request.getBeginDate());
+		json.put("endDate", request.getEndDate());
+		json.put("valid", request.getValid());
+		json.put("remark", request.getRemark());
+		return add(json, request.getOperator());
 	}
 
 	/**
