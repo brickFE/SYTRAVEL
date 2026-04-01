@@ -68,7 +68,7 @@ public class SYRoleRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
-	public AjaxResult<String> delete(@RequestParam("id") int id, @RequestParam("operator") String operator,
+	public AjaxResult<String> delete(@RequestParam("id") @Min(1) int id, @RequestParam("operator") String operator,
 			HttpServletRequest request) {
 		return syRoleService.delete(id, operator);
 	}

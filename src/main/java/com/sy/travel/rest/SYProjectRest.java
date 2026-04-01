@@ -56,7 +56,7 @@ public class SYProjectRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/info", method = RequestMethod.GET)
-	public AjaxResult<Map<String, Object>> info(@RequestParam(defaultValue = "0") Integer id) {
+	public AjaxResult<Map<String, Object>> info(@RequestParam(defaultValue = "1") @Min(1) Integer id) {
 		return AjaxResult.success(syProjectService.info(id));
 	}
 	/**
@@ -76,7 +76,7 @@ public class SYProjectRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
-	public AjaxResult<String> delete(@RequestParam("id") Integer id, @RequestParam("operator") String operator){
+	public AjaxResult<String> delete(@RequestParam("id") @Min(1) Integer id, @RequestParam("operator") String operator){
 		return syProjectService.deleteById(id, operator);
 	}
 	

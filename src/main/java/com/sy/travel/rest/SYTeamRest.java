@@ -64,7 +64,7 @@ public class SYTeamRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/info", method = RequestMethod.GET)
-	public AjaxResult<List<Map<String, Object>>> info(@RequestParam("id") int id){
+	public AjaxResult<List<Map<String, Object>>> info(@RequestParam("id") @Min(1) int id){
 		return syTeamService.info(id);
 	}
 	
@@ -89,7 +89,7 @@ public class SYTeamRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
-	public AjaxResult<String> deleteByTeamId(@RequestParam("id") Integer id, @RequestParam("operator") String operator) {
+	public AjaxResult<String> deleteByTeamId(@RequestParam("id") @Min(1) Integer id, @RequestParam("operator") String operator) {
 		return syTeamService.deleteByTeamId(id, operator);
 	}
 	/**

@@ -58,7 +58,7 @@ public class SYUserRest {
 	 * 删除用户信息
 	 */
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
-	public AjaxResult<String> delete(@RequestParam("id") int id, @RequestParam("operator") String operator) {
+	public AjaxResult<String> delete(@RequestParam("id") @Min(1) int id, @RequestParam("operator") String operator) {
 		return syUserservice.delete(id, operator);
 	}
 

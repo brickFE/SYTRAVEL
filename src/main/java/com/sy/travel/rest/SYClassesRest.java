@@ -53,7 +53,7 @@ public class SYClassesRest {
 	 * 删除分类信息:如果这个分类下有产品信息则不能删除这个分类
 	 */
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
-	public AjaxResult<String> delete(@RequestParam("id") int id, @RequestParam("operator") String operator){
+	public AjaxResult<String> delete(@RequestParam("id") @Min(1) int id, @RequestParam("operator") String operator){
 		return syClassesService.delete(id, operator);
 	}
 	

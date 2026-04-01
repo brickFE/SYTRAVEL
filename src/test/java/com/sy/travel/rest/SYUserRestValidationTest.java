@@ -66,4 +66,10 @@ public class SYUserRestValidationTest {
 		mockMvc.perform(get("/sy/user/all").param("pageSize", "0"))
 				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
 	}
+
+	@Test
+	public void deleteShouldReturnBadRequestWhenIdInvalid() throws Exception {
+		mockMvc.perform(get("/sy/user/delete").param("id", "0").param("operator", "admin"))
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
+	}
 }
