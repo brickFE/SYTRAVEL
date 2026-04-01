@@ -1,6 +1,7 @@
 package com.sy.travel.rest;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,6 +37,12 @@ public class SYProductRestValidationTest {
 	public void updateShouldReturnBadRequestWhenIdMissing() throws Exception {
 		String body = "{\"operator\":\"admin\",\"quantity\":1,\"minQty\":1,\"soldQty\":0,\"price\":1,\"nights\":1,\"status\":\"1\"}";
 		mockMvc.perform(post("/sy/product/update").contentType(MediaType.APPLICATION_JSON).content(body))
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
+	}
+
+	@Test
+	public void queryAllShouldReturnBadRequestWhenCurrentPageInvalid() throws Exception {
+		mockMvc.perform(get("/sy/product/all").param("currentPage", "0"))
 				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
 	}
 }

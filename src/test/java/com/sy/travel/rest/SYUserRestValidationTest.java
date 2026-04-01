@@ -1,6 +1,7 @@
 package com.sy.travel.rest;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -51,6 +52,12 @@ public class SYUserRestValidationTest {
 	public void adminPwdShouldReturnBadRequestWhenNewPwdMissing() throws Exception {
 		String body = "{\"operator\":\"admin\",\"password\":\"old\"}";
 		mockMvc.perform(post("/sy/user/adminpwd").contentType(MediaType.APPLICATION_JSON).content(body))
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
+	}
+
+	@Test
+	public void queryAllShouldReturnBadRequestWhenCurrentPageInvalid() throws Exception {
+		mockMvc.perform(get("/sy/user/all").param("currentPage", "0"))
 				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
 	}
 }
