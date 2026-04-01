@@ -20,6 +20,8 @@ import com.sy.travel.common.ResultBuilder;
 import com.sy.travel.common.Commons;
 import com.sy.travel.common.DateFormat;
 import com.sy.travel.dao.SYClassesRepository;
+import com.sy.travel.dto.classes.ClassesCreateRequest;
+import com.sy.travel.dto.classes.ClassesUpdateRequest;
 import com.sy.travel.entity.Classes;
 import com.sy.travel.entity.Logger;
 import com.sy.travel.utils.JSON;
@@ -84,6 +86,16 @@ public class SYClassesService implements DateFormat{
 			return result(operator, start, reason, "0", Commons.CLASSES_ADD);
 		}
 		return result(operator, start, reason, "1", Commons.CLASSES_ADD);
+	}
+
+	public AjaxResult<String> add(ClassesCreateRequest request) {
+		JSON json = new JSON();
+		json.put("operator", request.getOperator());
+		json.put("name", request.getName());
+		json.put("sortId", request.getSortId());
+		json.put("parentId", request.getParentId());
+		json.put("remark", request.getRemark());
+		return add(json, request.getOperator());
 	}
 	
 	/**
@@ -164,6 +176,17 @@ public class SYClassesService implements DateFormat{
 			return result(operator, start, reason, "0", Commons.CLASSES_ADD);
 		}
 		return result(operator, start, reason, "1", Commons.CLASSES_UPDATE);
+	}
+
+	public AjaxResult<String> update(ClassesUpdateRequest request) {
+		JSON json = new JSON();
+		json.put("operator", request.getOperator());
+		json.put("id", request.getId() == null ? null : String.valueOf(request.getId()));
+		json.put("name", request.getName());
+		json.put("sortId", request.getSortId());
+		json.put("parentId", request.getParentId());
+		json.put("remark", request.getRemark());
+		return update(json, request.getOperator());
 	}
 	
 	/**

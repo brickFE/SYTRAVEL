@@ -2,7 +2,7 @@ package com.sy.travel.rest;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sy.travel.common.AjaxResult;
+import com.sy.travel.dto.classes.ClassesCreateRequest;
+import com.sy.travel.dto.classes.ClassesUpdateRequest;
 import com.sy.travel.service.SYClassesService;
-import com.sy.travel.utils.JSON;
 
 /**
  * 分类的对页面接口
@@ -41,15 +42,15 @@ public class SYClassesRest {
 	 * 添加分类信息
 	 */
 	@RequestMapping(value = "/add", method = RequestMethod.POST, consumes = "application/json")
-	public AjaxResult<String> add(@RequestBody JSON json, HttpServletRequest request){
-		return syClassesService.add(json, request.getRemoteUser());
+	public AjaxResult<String> add(@Valid @RequestBody ClassesCreateRequest request){
+		return syClassesService.add(request);
 	}
 	
 	/**
 	 * 删除分类信息:如果这个分类下有产品信息则不能删除这个分类
 	 */
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
-	public AjaxResult<String> delete(@RequestParam("id") int id, @RequestParam("operator") String operator, HttpServletRequest request){
+	public AjaxResult<String> delete(@RequestParam("id") int id, @RequestParam("operator") String operator){
 		return syClassesService.delete(id, operator);
 	}
 	
@@ -57,8 +58,8 @@ public class SYClassesRest {
 	 * 修改分类信息
 	 */
 	@RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json")
-	public AjaxResult<String> delete(@RequestBody JSON json, HttpServletRequest request) {
-		return syClassesService.update(json, request.getRemoteUser());
+	public AjaxResult<String> delete(@Valid @RequestBody ClassesUpdateRequest request) {
+		return syClassesService.update(request);
 	}
 	
 	/**
