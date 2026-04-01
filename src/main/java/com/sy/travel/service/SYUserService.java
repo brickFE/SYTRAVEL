@@ -1,7 +1,6 @@
 package com.sy.travel.service;
 
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Service;
 import com.sy.travel.common.AjaxResult;
 import com.sy.travel.common.Commons;
 import com.sy.travel.common.DateFormat;
+import com.sy.travel.common.PasswordSupport;
 import com.sy.travel.dao.SYUserRepository;
 import com.sy.travel.dto.user.UserAdminPwdUpdateRequest;
 import com.sy.travel.dto.user.UserCreateRequest;
@@ -38,11 +38,6 @@ public class SYUserService implements DateFormat{
 	private SYUserRepository syUserRepository;
 	@Autowired
 	private SYLoggerService syLoggerService;
-	private String setPassword(String username, String password) {
-		String pwd = username + ":" + password;
-		byte[] encode = Base64.getEncoder().encode(pwd.getBytes());
-		return new String(encode);
-	}
 	/**
 	 * 添加用户信息
 	 * @param json
@@ -75,7 +70,7 @@ public class SYUserService implements DateFormat{
 		}
 		String remark = request.getRemark();
 		remark = StringUtils.isBlank(remark)? "" : remark;
-		User user = new User(username, setPassword(username, password), remark, permissionStr);
+		User user = new User(username, PasswordSupport.hash(password), remark, permissionStr);
 		User resl = syUserRepository.save(user);
 		if(resl == null) {
 			reason = Commons.USER_ADD_SAVE_FAILED;
@@ -137,7 +132,9 @@ public class SYUserService implements DateFormat{
 		}
 		String password = request.getPassword();
 		if(StringUtils.isBlank(password)) {
-			password = uTemp.getPassword();
+			password = uTemp.getEncodedPassword();
+		} else {
+			password = PasswordSupport.hash(password);
 		} 
 		String permissionStr = request.getPermission();
 		if(StringUtils.isBlank(permissionStr)) {
@@ -147,7 +144,7 @@ public class SYUserService implements DateFormat{
 		if(StringUtils.isBlank(remark)) {
 			remark = uTemp.getRemark();
 		}
-		User user = new User(uTemp.getUsername(), setPassword(uTemp.getUsername(), password), remark, permissionStr);
+		User user = new User(uTemp.getUsername(), password, remark, permissionStr);
 		user.setId(id);
 		User resl = syUserRepository.save(user);
 		if(resl == null) {
@@ -181,7 +178,7 @@ public class SYUserService implements DateFormat{
 			reason = Commons.USER_ADMIN_OLD_PASSWORD_EMPTY;
 			return result(operator, start, reason, "0", Commons.USER_UPDATE_PWD);
 		} 
-		if(!password.equals(uTemp.getPassword())) {
+		if(!PasswordSupport.matches(uTemp.getUsername(), password, uTemp.getEncodedPassword())) {
 			reason = Commons.USER_ADMIN_OLD_PASSWORD_ERROR;
 			return result(operator, start, reason, "0", Commons.USER_UPDATE_PWD);
 		}
@@ -190,7 +187,7 @@ public class SYUserService implements DateFormat{
 			reason = Commons.USER_ADMIN_NEW_PASSWORD_EMPTY;
 			return result(operator, start, reason, "0", Commons.USER_UPDATE_PWD);
 		} 
-		User user = new User(uTemp.getUsername(), setPassword(uTemp.getUsername(), newPwd), uTemp.getRemark(), uTemp.getPermission());
+		User user = new User(uTemp.getUsername(), PasswordSupport.hash(newPwd), uTemp.getRemark(), uTemp.getPermission());
 		user.setId(uTemp.getId());
 		User resl = syUserRepository.save(user);
 		if(resl == null) {

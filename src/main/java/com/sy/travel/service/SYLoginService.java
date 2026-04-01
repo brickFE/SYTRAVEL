@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.sy.travel.common.AjaxResult;
 import com.sy.travel.common.Commons;
+import com.sy.travel.common.PasswordSupport;
 import com.sy.travel.dao.SYUserRepository;
 import com.sy.travel.entity.User;
 import com.sy.travel.utils.JSON;
@@ -37,9 +38,13 @@ public class SYLoginService {
 			reason = Commons.LOGIN_CHECK_NAME_NOT_EXISTS;
 			return AjaxResult.failed(200, reason);
 		}
-		if(!password.equals(user.getPassword())) {
+		if(!PasswordSupport.matches(user.getUsername(), password, user.getEncodedPassword())) {
 			reason = Commons.LOGIN_CHECK_PWD_ERROR;
 			return AjaxResult.failed(200, reason);
+		}
+		if(!PasswordSupport.isBcryptHash(user.getEncodedPassword())) {
+			user.setPassword(PasswordSupport.hash(password));
+			syUserRepository.save(user);
 		}
 		return AjaxResult.success(user.getPermission());
 	}
