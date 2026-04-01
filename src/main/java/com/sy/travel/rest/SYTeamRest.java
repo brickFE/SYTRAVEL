@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,6 +27,7 @@ import com.sy.travel.service.SYTeamService;
  *
  */
 @RestController
+@Validated
 @RequestMapping(value = "/sy/team", produces = MediaType.APPLICATION_JSON_VALUE)
 public class SYTeamRest {
 	@Autowired
@@ -38,8 +41,8 @@ public class SYTeamRest {
 	@RequestMapping(value = "/all", method = RequestMethod.GET)
 	public AjaxResult<Map<String, Object>> findAll(
 			@RequestParam(defaultValue = "") String name,
-			@RequestParam(defaultValue = "1") int currentPage,
-			@RequestParam(defaultValue = "5") int pageSize) {
+			@RequestParam(defaultValue = "1") @Min(1) int currentPage,
+			@RequestParam(defaultValue = "5") @Min(1) int pageSize) {
 		return AjaxResult.success(syTeamService.findAll(name,currentPage,pageSize));
 	}
 

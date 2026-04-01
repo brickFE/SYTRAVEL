@@ -1,6 +1,7 @@
 package com.sy.travel.rest;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,6 +37,12 @@ public class SYProjectRestValidationTest {
 	public void updateShouldReturnBadRequestWhenIdMissing() throws Exception {
 		String body = "{\"operator\":\"admin\"}";
 		mockMvc.perform(post("/sy/project/update").contentType(MediaType.APPLICATION_JSON).content(body))
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
+	}
+
+	@Test
+	public void allShouldReturnBadRequestWhenCurrentPageInvalid() throws Exception {
+		mockMvc.perform(get("/sy/project/all").param("currentPage", "0"))
 				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
 	}
 }

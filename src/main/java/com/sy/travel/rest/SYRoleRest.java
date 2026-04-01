@@ -4,9 +4,11 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,6 +27,7 @@ import com.sy.travel.service.SYRoleService;
  *
  */
 @RestController
+@Validated
 @RequestMapping(value = "/sy/role", produces = MediaType.APPLICATION_JSON_VALUE)
 public class SYRoleRest {
 	@Autowired
@@ -40,8 +43,8 @@ public class SYRoleRest {
 	@RequestMapping(value = "/all", method = RequestMethod.GET)
 	public AjaxResult<Map<String, Object>> queryAll(
 			@RequestParam(defaultValue = "") String teamId,
-			@RequestParam(defaultValue = "1") int currentPage,
-			@RequestParam(defaultValue = "10") int pageSize) {
+			@RequestParam(defaultValue = "1") @Min(1) int currentPage,
+			@RequestParam(defaultValue = "10") @Min(1) int pageSize) {
 		return AjaxResult.success(syRoleService.queryAll(teamId, currentPage, pageSize));
 	}
 
