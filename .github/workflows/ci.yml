@@ -22,11 +22,8 @@ jobs:
           java-version: '8'
           cache: maven
 
-      - name: Unit tests
-        run: mvn -q -Dtest=PasswordSupportTest,SYLoginServiceTest,SYUserServiceTest,PermissionGuardTest test
-
-      - name: Controller validation tests
-        run: mvn -q -Dtest=SYUserRestValidationTest,SYProjectRestValidationTest,SYTeamRestValidationTest,SYProductRestValidationTest,SYRoleRestValidationTest,SYClassesRestValidationTest test
+      - name: Smoke gate
+        run: ./scripts/test-gate.sh smoke
 
   full-regression:
     runs-on: ubuntu-latest
@@ -43,4 +40,4 @@ jobs:
           cache: maven
 
       - name: Full test suite
-        run: mvn test
+        run: ./scripts/test-gate.sh full

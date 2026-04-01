@@ -26,6 +26,12 @@
 mvn -q -Dtest=PasswordSupportTest,SYLoginServiceTest,SYUserServiceTest,PermissionGuardTest test
 ```
 
+统一脚本：
+
+```bash
+./scripts/test-gate.sh unit
+```
+
 ### 2.2 控制器参数校验测试（MockMvc）
 
 建议执行：
@@ -43,10 +49,22 @@ mvn -q -Dtest=PasswordSupportTest,SYLoginServiceTest,SYUserServiceTest,Permissio
 mvn -q -Dtest=SYUserRestValidationTest,SYProjectRestValidationTest,SYTeamRestValidationTest,SYProductRestValidationTest,SYRoleRestValidationTest,SYClassesRestValidationTest test
 ```
 
+统一脚本：
+
+```bash
+./scripts/test-gate.sh validation
+```
+
 ## 3. 全量回归
 
 ```bash
 mvn test
+```
+
+统一脚本：
+
+```bash
+./scripts/test-gate.sh full
 ```
 
 ## 4. 常见问题

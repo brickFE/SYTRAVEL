@@ -69,6 +69,12 @@ mvn test
 
 CI 已配置在 `.github/workflows/ci.yml`，默认执行单元测试、控制器参数校验测试，并在主分支执行全量回归。
 
+推荐使用统一测试入口脚本：
+
+```bash
+./scripts/test-gate.sh smoke
+```
+
 ---
 
 ## 下一步
