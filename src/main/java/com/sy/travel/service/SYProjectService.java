@@ -23,6 +23,7 @@ import com.sy.travel.dto.project.ProjectCreateRequest;
 import com.sy.travel.dto.project.ProjectUpdateRequest;
 import com.sy.travel.entity.Project;
 import com.sy.travel.service.support.OperationResultSupport;
+import com.sy.travel.service.support.PermissionGuard;
 import com.sy.travel.utils.JSON;
 
 
@@ -42,6 +43,8 @@ public class SYProjectService implements DateFormat{
 	private SYProductService syProductService;
 	@Autowired
 	private SYLoggerService syLoggerService;
+	@Autowired
+	private PermissionGuard permissionGuard;
 
 	/**
 	 * 添加项目信息
@@ -56,6 +59,10 @@ public class SYProjectService implements DateFormat{
 		operator = (String) json.get("operator");// 操作人
 		Date start = new Date();// 添加操作开始时间
 		String reason = "";// 记录操作过程中的操作结果
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.PROJECT_ADD);
+		}
 		String code = (String) json.get("code");
 		if (StringUtils.isBlank(code)) {
 			reason = Commons.PROJECT_ADD_CODE_NOT_NULL;
@@ -154,6 +161,10 @@ public class SYProjectService implements DateFormat{
 	public AjaxResult<String> deleteById(int id, String operator) {
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.PROJECT_DELETE);
+		}
 		try {
 			// 根据项目id查询这个项目下的团队信息
 			Map<String, Object> teamMap = syTeamService.queryByProjectId(String.valueOf(id));
@@ -186,6 +197,10 @@ public class SYProjectService implements DateFormat{
 		operator = (String) json.get("operator");
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.PROJECT_UPDATE);
+		}
 		if (StringUtils.isBlank((String) json.get("id"))) {
 			reason = Commons.PROJECT_UPDATE_ID_NOT_NULL;
 			return result(operator, start, reason, "0", Commons.PROJECT_UPDATE);

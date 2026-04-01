@@ -29,6 +29,7 @@ import com.sy.travel.entity.Project;
 import com.sy.travel.entity.Role;
 import com.sy.travel.entity.Team;
 import com.sy.travel.service.support.OperationResultSupport;
+import com.sy.travel.service.support.PermissionGuard;
 import com.sy.travel.utils.JSON;
 
 /**
@@ -51,6 +52,8 @@ public class SYTeamService implements DateFormat{
 	private SYLoggerService syLoggerService;
 	@Autowired
 	private SYRoleRepository syRoleRepository;
+	@Autowired
+	private PermissionGuard permissionGuard;
 
 	/**
 	 * 查询所有团队信息的逻辑操作
@@ -125,8 +128,12 @@ public class SYTeamService implements DateFormat{
 	public AjaxResult<String> add(JSON json, String operator) {
 		operator = (String) json.get("operator");
 		Date start = new Date();
-		String name = (String) json.get("name");
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.TEAM_ADD);
+		}
+		String name = (String) json.get("name");
 		if (StringUtils.isBlank(name)) {
 			reason = Commons.TEAM_ADD_NAME_NOT_NULL;
 			return result(operator, start, reason, "0", Commons.TEAM_ADD);
@@ -215,6 +222,10 @@ public class SYTeamService implements DateFormat{
 	public AjaxResult<String> deleteByTeamId(Integer id, String operator) {
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.TEAM_DELETE);
+		}
 		try {
 			teamRepository.delete(id);
 			//删除这个团队下的产品信息
@@ -267,6 +278,10 @@ public class SYTeamService implements DateFormat{
 		operator = (String) json.get("operator");
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.TEAM_UPDATE);
+		}
 		if (StringUtils.isBlank((String) json.get("id"))) {
 			reason = Commons.PROJECT_UPDATE_ID_NOT_NULL;
 			return result(operator, start, reason, "0", Commons.TEAM_UPDATE);

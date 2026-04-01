@@ -23,6 +23,7 @@ import com.sy.travel.dto.classes.ClassesCreateRequest;
 import com.sy.travel.dto.classes.ClassesUpdateRequest;
 import com.sy.travel.entity.Classes;
 import com.sy.travel.service.support.OperationResultSupport;
+import com.sy.travel.service.support.PermissionGuard;
 import com.sy.travel.utils.JSON;
 /**
  * 分类信息的服务层处理
@@ -37,6 +38,8 @@ public class SYClassesService implements DateFormat{
 	private SYClassesRepository syClassesRepository;
 	@Autowired
 	private SYLoggerService syLoggerService;
+	@Autowired
+	private PermissionGuard permissionGuard;
 	
 	/**
 	 * 添加分类信息
@@ -48,6 +51,10 @@ public class SYClassesService implements DateFormat{
 		Date start = new Date();
 		operator = (String) json.get("operator");
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.CLASSES_ADD);
+		}
 		String name = (String) json.get("name");
 		if(StringUtils.isBlank(name)) {
 			reason = Commons.CLASSES_ADD_NAME_NOT_NULL;
@@ -106,6 +113,10 @@ public class SYClassesService implements DateFormat{
 	public AjaxResult<String> delete(int id, String operator) {
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.CLASSES_DELETE);
+		}
 		Classes classes = syClassesRepository.findOne(id);
 		if(classes == null) {
 			reason = Commons.CLASSES_DELETE_DATA_NOT_EXISTS;
@@ -132,6 +143,10 @@ public class SYClassesService implements DateFormat{
 		operator = (String) json.get("operator");
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.CLASSES_UPDATE);
+		}
 		int id = Integer.valueOf((String)json.get("id"));
 		Classes classes = syClassesRepository.findOne(id);
 		String name = (String) json.get("name");

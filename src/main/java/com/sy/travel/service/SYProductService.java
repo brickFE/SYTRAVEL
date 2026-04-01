@@ -25,6 +25,7 @@ import com.sy.travel.dto.product.ProductCreateRequest;
 import com.sy.travel.dto.product.ProductUpdateRequest;
 import com.sy.travel.entity.Product;
 import com.sy.travel.service.support.OperationResultSupport;
+import com.sy.travel.service.support.PermissionGuard;
 import com.sy.travel.utils.JSON;
 
 /**
@@ -42,6 +43,8 @@ public class SYProductService implements DateFormat{
 	private SYClassesRepository syClassesRepository;
 	@Autowired
 	private SYLoggerService syLoggerService;
+	@Autowired
+	private PermissionGuard permissionGuard;
 
 	/**
 	 * 添加产品信息
@@ -53,6 +56,10 @@ public class SYProductService implements DateFormat{
 		operator = (String) json.get("operator");
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.PRODUCT_ADD);
+		}
 		String code = (String) json.get("code");
 		if(StringUtils.isBlank(code)) {
 			reason = Commons.PRODUCT_ADD_CODE_NOT_NULL;
@@ -158,6 +165,10 @@ public class SYProductService implements DateFormat{
 	public AjaxResult<String> delete(int id, String operator){
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.PRODUCT_DELETE);
+		}
 		try {
 			syProductRepository.delete(id);
 			return result(operator, start, reason, "1", Commons.PRODUCT_DELETE);
@@ -179,6 +190,10 @@ public class SYProductService implements DateFormat{
 		operator = (String) json.get("operator");
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.PRODUCT_DELETE);
+		}
 		int id = (int) json.get("id");
 		Product product = syProductRepository.findOne(id);
 		if(product == null) {
