@@ -309,7 +309,7 @@ public class SYProductService implements DateFormat{
 	 */
 	private AjaxResult<String> result(String operator, Date start, String reason, String status, String operation) {
 		Logger logger = new Logger(operator, sdf.format(start), sdf.format(new Date()),
-				StringUtils.isBlank(reason) ? operator + operation + ":成功" : operator + operation + "失败原因:" + reason,
+				ResultBuilder.operationMessage(operator, operation, reason),
 				status, operation);// 记录操作日志
 		syLoggerService.save(logger);
 		return ResultBuilder.byStatus(status, reason);
