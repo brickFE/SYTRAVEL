@@ -71,3 +71,5 @@ mvn test
   - 控制器校验测试（2.2）
 - 主分支门禁：
   - `mvn test` 全量
+
+仓库已提供参考实现：`.github/workflows/ci.yml`。
