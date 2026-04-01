@@ -20,6 +20,8 @@ import com.sy.travel.common.ResultBuilder;
 import com.sy.travel.common.Commons;
 import com.sy.travel.common.DateFormat;
 import com.sy.travel.dao.SYRoleRepository;
+import com.sy.travel.dto.role.RoleCreateRequest;
+import com.sy.travel.dto.role.RoleUpdateRequest;
 import com.sy.travel.entity.Logger;
 import com.sy.travel.entity.Role;
 import com.sy.travel.utils.JSON;
@@ -102,6 +104,18 @@ public class SYRoleService implements DateFormat{
 		}
 		return result(operator, start, reason, "1", Commons.ROLE_ADD);
 	}
+
+	public AjaxResult<String> add(RoleCreateRequest request) {
+		JSON json = new JSON();
+		json.put("operator", request.getOperator());
+		json.put("name", request.getName());
+		json.put("teamId", request.getTeamId());
+		json.put("role", request.getRole());
+		json.put("email", request.getEmail());
+		json.put("mobile", request.getMobile());
+		json.put("remark", request.getRemark());
+		return add(json, request.getOperator());
+	}
 	
 	/**
 	 * 删除角色信息
@@ -175,6 +189,17 @@ public class SYRoleService implements DateFormat{
 			return result(operator, start, reason, "0", Commons.ROLE_UPDATE);
 		}
 		return result(operator, start, reason, "1", Commons.ROLE_UPDATE);
+	}
+
+	public AjaxResult<String> update(RoleUpdateRequest request){
+		JSON json = new JSON();
+		json.put("operator", request.getOperator());
+		json.put("id", String.valueOf(request.getId()));
+		json.put("role", request.getRole());
+		json.put("email", request.getEmail());
+		json.put("mobile", request.getMobile());
+		json.put("remark", request.getRemark());
+		return update(json, request.getOperator());
 	}
 	
 

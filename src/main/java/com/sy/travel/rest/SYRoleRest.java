@@ -3,6 +3,7 @@ package com.sy.travel.rest;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -13,8 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sy.travel.common.AjaxResult;
+import com.sy.travel.dto.role.RoleCreateRequest;
+import com.sy.travel.dto.role.RoleUpdateRequest;
 import com.sy.travel.service.SYRoleService;
-import com.sy.travel.utils.JSON;
 
 /**
  * 角色模块接口
@@ -51,8 +53,8 @@ public class SYRoleRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/add", method = RequestMethod.POST)
-	public AjaxResult<String> add(@RequestBody JSON json, HttpServletRequest request) {
-		return syRoleService.add(json, request.getRemoteUser());
+	public AjaxResult<String> add(@Valid @RequestBody RoleCreateRequest request) {
+		return syRoleService.add(request);
 	}
 
 	/**
@@ -75,7 +77,7 @@ public class SYRoleRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json")
-	public AjaxResult<String> update(@RequestBody JSON json, HttpServletRequest request){
-		return syRoleService.update(json, request.getRemoteUser());
+	public AjaxResult<String> update(@Valid @RequestBody RoleUpdateRequest request){
+		return syRoleService.update(request);
 	}
 }
