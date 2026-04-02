@@ -1,7 +1,7 @@
 # 测试执行手册（Test Runbook）
 
 > 适用仓库：`SYTRAVEL`  
-> 更新时间：2026-04-01
+> 更新时间：2026-04-02
 
 ## 1. 目标
 
@@ -95,3 +95,17 @@ mvn test
   - `mvn test` 全量
 
 仓库已提供参考实现：`.github/workflows/ci.yml`。
+
+## 6. 升级前预检（平台升级第一跳准备）
+
+在执行 `Boot 1.5 -> 2.7 + JDK17` 之前，先跑一次预检脚本，快速确认当前运行时基线和 `javax.*` 迁移规模：
+
+```bash
+./scripts/upgrade-precheck.sh
+```
+
+该脚本会输出：
+
+- 本地 Java / Maven 版本
+- `pom.xml` 中 `java.version` 与 Spring Boot Parent 版本
+- `javax.*` import 的出现次数（用于评估后续 Boot 3/Jakarta 改造工作量）
