@@ -6,8 +6,17 @@ cd "$ROOT_DIR"
 
 STRICT_MODE=0
 REPORT_FILE=""
+TARGET_PHASE="boot27-jdk11"
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --phase)
+      TARGET_PHASE="${2:-}"
+      if [[ -z "$TARGET_PHASE" ]]; then
+        echo "[upgrade-precheck] ERROR: --phase requires a value"
+        exit 2
+      fi
+      shift 2
+      ;;
     --strict)
       STRICT_MODE=1
       shift
@@ -28,6 +37,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 echo "[upgrade-precheck] project: $ROOT_DIR"
+echo "[upgrade-precheck] target phase: $TARGET_PHASE"
 
 if ! command -v java >/dev/null 2>&1; then
   echo "[upgrade-precheck] ERROR: java not found in PATH"
@@ -63,27 +73,72 @@ BOOT_PARENT_VERSION="$(
 
 echo "[upgrade-precheck] pom.java.version: ${POM_JAVA_VERSION:-unknown}"
 echo "[upgrade-precheck] spring-boot-parent: ${BOOT_PARENT_VERSION:-unknown}"
+EXPECTED_JAVA_MAJOR=""
+EXPECTED_POM_JAVA=""
+EXPECTED_BOOT_PARENT=""
+case "$TARGET_PHASE" in
+  boot27-jdk11)
+    EXPECTED_JAVA_MAJOR="11"
+    EXPECTED_POM_JAVA="11"
+    EXPECTED_BOOT_PARENT="2.7.18"
+    ;;
+  jdk17)
+    EXPECTED_JAVA_MAJOR="17"
+    EXPECTED_POM_JAVA="17"
+    EXPECTED_BOOT_PARENT="2.7.18"
+    ;;
+  boot3)
+    EXPECTED_JAVA_MAJOR="17"
+    EXPECTED_POM_JAVA="17"
+    EXPECTED_BOOT_PARENT="3."
+    ;;
+  *)
+    echo "[upgrade-precheck] ERROR: unsupported phase '$TARGET_PHASE' (supported: boot27-jdk11, jdk17, boot3)"
+    exit 2
+    ;;
+esac
 
-if [[ "${POM_JAVA_VERSION:-}" != "1.8" ]]; then
-  echo "[upgrade-precheck] WARN: expected baseline java.version=1.8 before first upgrade hop"
+match_parent_version() {
+  local actual="${1:-}"
+  local expected="${2:-}"
+  if [[ -z "$actual" || -z "$expected" ]]; then
+    return 1
+  fi
+  if [[ "$expected" == *"." ]]; then
+    [[ "$actual" == "$expected"* ]]
+  else
+    [[ "$actual" == "$expected" ]]
+  fi
+}
+
+RUNTIME_OK=1
+POM_JAVA_OK=1
+BOOT_PARENT_OK=1
+if [[ "${JAVA_MAJOR:-}" != "$EXPECTED_JAVA_MAJOR" ]]; then
+  echo "[upgrade-precheck] WARN: expected runtime Java major $EXPECTED_JAVA_MAJOR, got ${JAVA_MAJOR:-unknown}"
+  RUNTIME_OK=0
 fi
-
-if [[ "${BOOT_PARENT_VERSION:-}" != "1.5.9.RELEASE" ]]; then
-  echo "[upgrade-precheck] WARN: expected current parent spring-boot-starter-parent=1.5.9.RELEASE"
+if [[ "${POM_JAVA_VERSION:-}" != "$EXPECTED_POM_JAVA" ]]; then
+  echo "[upgrade-precheck] WARN: expected pom java.version=$EXPECTED_POM_JAVA, got ${POM_JAVA_VERSION:-unknown}"
+  POM_JAVA_OK=0
+fi
+if ! match_parent_version "${BOOT_PARENT_VERSION:-}" "$EXPECTED_BOOT_PARENT"; then
+  echo "[upgrade-precheck] WARN: expected spring-boot-starter-parent=${EXPECTED_BOOT_PARENT}*, got ${BOOT_PARENT_VERSION:-unknown}"
+  BOOT_PARENT_OK=0
 fi
 
 STRICT_FAILED=0
 if [[ "$STRICT_MODE" -eq 1 ]]; then
-  if [[ "${JAVA_MAJOR:-}" != "8" ]]; then
-    echo "[upgrade-precheck] STRICT-ERROR: expected runtime Java major version 8, got ${JAVA_MAJOR:-unknown}"
+  if [[ "$RUNTIME_OK" -eq 0 ]]; then
+    echo "[upgrade-precheck] STRICT-ERROR: runtime Java does not match target phase requirement"
     STRICT_FAILED=1
   fi
-  if [[ "${POM_JAVA_VERSION:-}" != "1.8" ]]; then
-    echo "[upgrade-precheck] STRICT-ERROR: expected pom java.version=1.8"
+  if [[ "$POM_JAVA_OK" -eq 0 ]]; then
+    echo "[upgrade-precheck] STRICT-ERROR: pom java.version does not match target phase requirement"
     STRICT_FAILED=1
   fi
-  if [[ "${BOOT_PARENT_VERSION:-}" != "1.5.9.RELEASE" ]]; then
-    echo "[upgrade-precheck] STRICT-ERROR: expected spring-boot-starter-parent=1.5.9.RELEASE"
+  if [[ "$BOOT_PARENT_OK" -eq 0 ]]; then
+    echo "[upgrade-precheck] STRICT-ERROR: spring boot parent does not match target phase requirement"
     STRICT_FAILED=1
   fi
 fi
@@ -128,11 +183,15 @@ if [[ -n "$REPORT_FILE" ]]; then
   {
     echo "upgrade_precheck_strict_mode=$STRICT_MODE"
     echo "upgrade_precheck_strict_failed=$STRICT_FAILED"
+    echo "target_phase=$TARGET_PHASE"
     echo "java_version_raw=$JAVA_VERSION_RAW"
     echo "java_major=$JAVA_MAJOR"
     echo "maven_version_raw=$MVN_VERSION_RAW"
     echo "pom_java_version=${POM_JAVA_VERSION:-unknown}"
     echo "spring_boot_parent=${BOOT_PARENT_VERSION:-unknown}"
+    echo "runtime_java_ok=$RUNTIME_OK"
+    echo "pom_java_ok=$POM_JAVA_OK"
+    echo "spring_boot_parent_ok=$BOOT_PARENT_OK"
     echo "javax_import_occurrences=$JAVA_FILES_WITH_JAVAX"
     echo "javax_servlet_count=$JAVAX_SERVLET_COUNT"
     echo "javax_validation_count=$JAVAX_VALIDATION_COUNT"

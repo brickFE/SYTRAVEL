@@ -5,6 +5,9 @@ MODE="${1:-smoke}"
 TMP_LOG="$(mktemp)"
 trap 'rm -f "${TMP_LOG}"' EXIT
 
+UNIT_TESTS="PasswordSupportTest,SYLoginServiceTest,SYUserServiceTest,PermissionGuardTest,SYWebsocketServiceTest,GlobalExceptionHandlerTest"
+VALIDATION_TESTS="SYLoginRestValidationTest,SYUserRestValidationTest,SYProjectRestValidationTest,SYTeamRestValidationTest,SYProductRestValidationTest,SYRoleRestValidationTest,SYClassesRestValidationTest,SYLoggerRestValidationTest"
+
 run_mvn() {
   local cmd="$*"
   set +e
@@ -22,11 +25,13 @@ run_mvn() {
 }
 
 run_unit() {
-  run_mvn mvn -q -Dtest=PasswordSupportTest,SYLoginServiceTest,SYUserServiceTest,PermissionGuardTest test
+  echo "[test-gate] unit tests: ${UNIT_TESTS}"
+  run_mvn mvn -q -Dtest="${UNIT_TESTS}" test
 }
 
 run_validation() {
-  run_mvn mvn -q -Dtest=SYLoginRestValidationTest,SYUserRestValidationTest,SYProjectRestValidationTest,SYTeamRestValidationTest,SYProductRestValidationTest,SYRoleRestValidationTest,SYClassesRestValidationTest,SYLoggerRestValidationTest test
+  echo "[test-gate] validation tests: ${VALIDATION_TESTS}"
+  run_mvn mvn -q -Dtest="${VALIDATION_TESTS}" test
 }
 
 run_full() {

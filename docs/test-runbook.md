@@ -19,11 +19,13 @@
 - `SYLoginServiceTest`
 - `SYUserServiceTest`
 - `PermissionGuardTest`
+- `SYWebsocketServiceTest`
+- `GlobalExceptionHandlerTest`
 
 命令示例：
 
 ```bash
-mvn -q -Dtest=PasswordSupportTest,SYLoginServiceTest,SYUserServiceTest,PermissionGuardTest test
+mvn -q -Dtest=PasswordSupportTest,SYLoginServiceTest,SYUserServiceTest,PermissionGuardTest,SYWebsocketServiceTest,GlobalExceptionHandlerTest test
 ```
 
 统一脚本：
@@ -76,6 +78,7 @@ mvn test
 现象：
 
 - `spring-boot-starter-parent:1.5.9.RELEASE` 下载失败
+- `spring-boot-starter-parent:2.7.18` 下载失败
 - Maven 输出 `status code: 403`
 
 建议：
@@ -99,22 +102,22 @@ mvn test
 
 ## 6. 升级前预检（平台升级第一跳准备）
 
-在执行 `Boot 1.5 -> 2.7 + JDK17` 之前，先跑一次预检脚本，快速确认当前运行时基线和 `javax.*` 迁移规模：
+在当前执行阶段（Boot 2.7 + JDK11）先跑一次预检脚本，快速确认运行时基线和 `javax.*` 迁移规模：
 
 ```bash
-./scripts/upgrade-precheck.sh
+./scripts/upgrade-precheck.sh --phase boot27-jdk11
 ```
 
 CI 严格模式（用于门禁失败）：
 
 ```bash
-./scripts/upgrade-precheck.sh --strict
+./scripts/upgrade-precheck.sh --phase boot27-jdk11 --strict
 ```
 
 输出报告文件（便于 CI 归档）：
 
 ```bash
-./scripts/upgrade-precheck.sh --strict --report build/upgrade-precheck-report.txt
+./scripts/upgrade-precheck.sh --phase boot27-jdk11 --strict --report build/upgrade-precheck-report.txt
 ```
 
 该脚本会输出：
