@@ -62,7 +62,7 @@ public class SYClassesRest {
 	 * 修改分类信息
 	 */
 	@RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json")
-	public AjaxResult<String> delete(@Valid @RequestBody ClassesUpdateRequest request) {
+	public AjaxResult<String> update(@Valid @RequestBody ClassesUpdateRequest request) {
 		return syClassesService.update(request);
 	}
 	
