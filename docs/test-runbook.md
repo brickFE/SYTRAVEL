@@ -161,3 +161,24 @@ CI 严格模式（用于门禁失败）：
   - CI 使用 `--fail-on-unmapped`，若热点未命中 owner 映射将直接失败
   - 清单会基于 `javax` 分类计数自动给出迁移批次建议（Batch A/B/C/D）
   - CI 会校验清单格式关键段（Phase 0 / owner / unmapped owners）避免生成异常内容
+
+## 7. 最近一次执行结果（2026-04-02）
+
+已完成：
+
+- `./scripts/upgrade-precheck.sh --phase boot3 --strict --report build/upgrade-precheck-report.txt`（通过）
+- `./scripts/upgrade-build-checklist.sh build/upgrade-precheck-report.txt build/upgrade-execution-checklist.md config/upgrade-owners.map`（通过）
+
+受环境限制未完成：
+
+- `./scripts/test-gate.sh smoke`
+- `./scripts/test-gate.sh validation`
+- `./scripts/test-gate.sh full`
+
+失败原因：当前环境无法访问 `https://maven.aliyun.com/repository/public`，导致 Spring Boot Parent POM 解析失败。
+
+自动化处理建议：
+
+- 若为 **非手动** 执行链路且检测到同类网络错误（Unknown host / Network is unreachable），可将该任务标记为 `ignored_due_to_network` 并继续后续非依赖该测试结果的步骤。
+- 人工执行窗口恢复网络后，必须补跑 `full` 并回填结果。
+

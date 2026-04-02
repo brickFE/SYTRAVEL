@@ -151,4 +151,4 @@
 - [x] 鉴权与角色控制体系梳理（已收敛为用户/项目/团队/产品/角色/分类关键写操作管理员权限校验）
 - [x] 平台升级评估完成（见 `docs/platform-upgrade-assessment.md`，建议两跳迁移：1.5->2.7->3.x）
 - [x] Spring Boot 2.7 迁移分支起步（parent 升级到 2.7.18，Java 基线升级到 11）
-- [ ] 升级执行前置清单落地（依赖扫描、JDK17 兼容性预检）
+- [x] 升级执行前置清单落地（依赖扫描、JDK17 兼容性预检；2026-04-02 已执行 `upgrade-precheck.sh --phase boot3 --strict` 并生成 `build/upgrade-precheck-report.txt` / `build/upgrade-execution-checklist.md`）

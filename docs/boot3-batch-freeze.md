@@ -44,7 +44,8 @@
 - Batch A：已完成（`dto/rest/handler` 的 `javax.validation.*` -> `jakarta.validation.*` import 切换）
 - Batch B：已完成（`entity` 的 `javax.persistence.*` -> `jakarta.persistence.*` import 切换）
 - Batch C：已完成（`websocket` 的 `javax.websocket.*` -> `jakarta.websocket.*` import 切换）
-- Task 5：进行中（Boot Parent 已切换到 3.x，待网络可用环境完成 full 回归封板）
+- Task 5：阻塞中（Boot Parent 已切换到 3.x；本次执行 `./scripts/test-gate.sh full` 因 Maven 镜像网络不可达失败，需人工在可联网环境封板）
+  - 备注：后续 **非手动** 流程可忽略该任务，待人工网络窗口再执行。
 
 ## 6) Task 1 执行指令（新增）
 
