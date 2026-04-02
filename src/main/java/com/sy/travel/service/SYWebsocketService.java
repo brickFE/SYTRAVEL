@@ -21,6 +21,8 @@ import javax.websocket.server.ServerEndpoint;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.sy.travel.common.AjaxResult;
@@ -28,6 +30,7 @@ import com.sy.travel.common.AjaxResult;
 @ServerEndpoint("/sy/refresh")
 @Component
 public class SYWebsocketService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(SYWebsocketService.class);
 	private static SYProjectService sYProjectService;
 	private static SYTeamService syTeamService;
 	private static SYProductService syProductService;
@@ -60,7 +63,7 @@ public class SYWebsocketService {
 					Gson gson = new Gson();
 					session.getBasicRemote().sendText(gson.toJson(getMonitor()));
 				} catch (IOException e) {
-					e.printStackTrace();
+					LOGGER.warn("websocket monitor push failed", e);
 				}
 			}
 		}, 0, intervalMillis, TimeUnit.MILLISECONDS);
