@@ -36,6 +36,13 @@ jobs:
         if: always()
         run: ./scripts/upgrade-build-checklist.sh build/upgrade-precheck-report.txt build/upgrade-execution-checklist.md config/upgrade-owners.map --fail-on-unmapped
 
+      - name: Validate upgrade execution checklist format
+        if: always()
+        run: |
+          grep -q "Phase 0 - Recommended Migration Batches" build/upgrade-execution-checklist.md
+          grep -q "owner:" build/upgrade-execution-checklist.md
+          grep -q "unmapped owners:" build/upgrade-execution-checklist.md
+
       - name: Upload upgrade execution checklist
         if: always()
         uses: actions/upload-artifact@v4
