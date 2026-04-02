@@ -120,7 +120,7 @@
 
 ## 7. 当前重构进度（滚动更新）
 
-> 更新时间：2026-04-01
+> 更新时间：2026-04-02
 
 ### 已完成
 
@@ -131,6 +131,9 @@
 - [x] 用户模块服务层移除动态 JSON 入参依赖（改为 DTO）
 - [x] 多个 Service/Rest 返回构造统一迁移到 `AjaxResult` 工厂方法
 - [x] 用户模块基础单元/接口测试补齐（`SYUserServiceTest` / `SYUserRestValidationTest`）
+- [x] 参数校验一致性增强：删除接口 `operator` 非空约束覆盖用户/项目/团队/产品/角色/分类模块
+- [x] 全局异常处理增强：`ConstraintViolationException` / `MissingServletRequestParameterException` / `MethodArgumentTypeMismatchException` 统一返回结构化 400
+- [x] 500 错误信息脱敏：异常详情不再回传客户端，统一返回通用内部错误消息（避免泄露内部实现细节）
 
 ### 进行中
 
@@ -147,3 +150,4 @@
 - [x] 密码存储从 Base64 迁移到 BCrypt（登录成功自动升级旧密码）
 - [x] 鉴权与角色控制体系梳理（已收敛为用户/项目/团队/产品/角色/分类关键写操作管理员权限校验）
 - [x] 平台升级评估完成（见 `docs/platform-upgrade-assessment.md`，建议两跳迁移：1.5->2.7->3.x）
+- [ ] 升级执行前置清单落地（依赖扫描、JDK17 兼容性预检、Spring Boot 2.7 迁移分支）
