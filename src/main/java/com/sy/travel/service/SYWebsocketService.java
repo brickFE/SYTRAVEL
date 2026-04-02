@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -31,6 +32,7 @@ public class SYWebsocketService {
 	private static SYTeamService syTeamService;
 	private static SYProductService syProductService;
 	private ScheduledExecutorService scheduledService;
+	private ScheduledFuture<?> monitorTask;
 	@Autowired
 	public void get(SYProjectService sYProjectService, SYTeamService syTeamService, SYProductService syProductService) {
 		SYWebsocketService.sYProjectService = sYProjectService;
@@ -44,7 +46,14 @@ public class SYWebsocketService {
 	
 	@OnMessage
 	public void onMessage(String message, Session session) {
-		scheduledService.scheduleAtFixedRate(new Runnable() {
+		if (scheduledService == null) {
+			scheduledService = Executors.newSingleThreadScheduledExecutor();
+		}
+		if (monitorTask != null && !monitorTask.isCancelled()) {
+			monitorTask.cancel(true);
+		}
+		int intervalMillis = resolveIntervalMillis(message);
+		monitorTask = scheduledService.scheduleAtFixedRate(new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -54,11 +63,14 @@ public class SYWebsocketService {
 					e.printStackTrace();
 				}
 			}
-		}, 0, Integer.valueOf(message), TimeUnit.MILLISECONDS);
+		}, 0, intervalMillis, TimeUnit.MILLISECONDS);
 	}
 	
 	@OnClose
 	public void onClose(Session session, CloseReason closeReason) {
+		if (monitorTask != null) {
+			monitorTask.cancel(true);
+		}
 		if (scheduledService != null) {
 			scheduledService.shutdownNow();
 		}
@@ -66,8 +78,20 @@ public class SYWebsocketService {
 	
 	@OnError
 	public void onError(Throwable t) {
+		if (monitorTask != null) {
+			monitorTask.cancel(true);
+		}
 		if (scheduledService != null) {
 			scheduledService.shutdownNow();
+		}
+	}
+
+	int resolveIntervalMillis(String message) {
+		try {
+			int value = Integer.parseInt(message);
+			return Math.max(100, value);
+		} catch (NumberFormatException ex) {
+			return 1000;
 		}
 	}
 	

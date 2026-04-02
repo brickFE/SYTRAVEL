@@ -17,6 +17,18 @@ import com.sy.travel.common.AjaxResult;
 public class SYWebsocketServiceTest {
 
 	@Test
+	public void resolveIntervalMillisShouldUseDefaultWhenInvalid() {
+		SYWebsocketService service = new SYWebsocketService();
+		assertEquals(1000, service.resolveIntervalMillis("abc"));
+	}
+
+	@Test
+	public void resolveIntervalMillisShouldClampTooSmallValues() {
+		SYWebsocketService service = new SYWebsocketService();
+		assertEquals(100, service.resolveIntervalMillis("1"));
+	}
+
+	@Test
 	public void getMonitorShouldHandleNullTeamAndProductMapsIndependently() {
 		SYProjectService projectService = mock(SYProjectService.class);
 		SYTeamService teamService = mock(SYTeamService.class);
