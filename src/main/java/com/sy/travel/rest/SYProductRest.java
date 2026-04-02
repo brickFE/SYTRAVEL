@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -71,7 +72,7 @@ public class SYProductRest {
 	 * 删除产品信息
 	 */
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
-	public AjaxResult<String> delete(@RequestParam("id") @Min(1) int id, @RequestParam("operator") String operator){
+	public AjaxResult<String> delete(@RequestParam("id") @Min(1) int id, @RequestParam("operator") @NotBlank String operator){
 		return syProductService.delete(id, operator);
 	}
 	

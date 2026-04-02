@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -89,7 +90,7 @@ public class SYTeamRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
-	public AjaxResult<String> deleteByTeamId(@RequestParam("id") @Min(1) Integer id, @RequestParam("operator") String operator) {
+	public AjaxResult<String> deleteByTeamId(@RequestParam("id") @Min(1) Integer id, @RequestParam("operator") @NotBlank String operator) {
 		return syTeamService.deleteByTeamId(id, operator);
 	}
 	/**
