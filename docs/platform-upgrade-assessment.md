@@ -73,3 +73,8 @@
 ```
 
 - CI 中已上传 artifact：`boot3-jakarta-migration-plan`、`boot3-jakarta-task-board`（便于按批次推进下一阶段改造）
+
+## 9. 迁移批次冻结状态（Task 1）
+
+- 已完成批次范围冻结：见 `docs/boot3-batch-freeze.md`
+- Batch A/B/C 的范围与验收门槛已固化，后续迭代按冻结规则推进

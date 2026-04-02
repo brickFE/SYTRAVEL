@@ -34,6 +34,7 @@ SYTRAVEL 是一个旅游业务管理系统后端项目，当前升级分支已�
 - `docs/refactor-plan.md`
 - `docs/platform-upgrade-assessment.md`
 - `docs/test-runbook.md`
+- `docs/boot3-batch-freeze.md`
 
 ---
 
