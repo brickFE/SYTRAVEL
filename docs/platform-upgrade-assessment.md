@@ -58,3 +58,15 @@
 2. 规划并执行 Boot 3.x 的 `javax` -> `jakarta` 分阶段迁移  
 3. 建立 Boot 3 迁移专用回归集并持续跟踪兼容阻塞  
 4. 以登录/用户/项目/团队/产品/角色/分类回归集作为强制验收门槛
+
+## 8. Boot 3 迁移执行化（新增）
+
+- 已新增脚本：`scripts/boot3-migration-plan.sh`
+- 用途：基于仓库中 `javax.*` import 自动生成 Boot 3 / Jakarta 迁移计划与热点文件清单
+- 本地执行示例：
+
+```bash
+./scripts/boot3-migration-plan.sh build/boot3-jakarta-migration-plan.md
+```
+
+- CI 中已上传 artifact：`boot3-jakarta-migration-plan`（便于按批次推进下一阶段改造）
