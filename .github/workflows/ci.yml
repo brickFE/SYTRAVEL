@@ -63,6 +63,17 @@ jobs:
           name: boot3-jakarta-migration-plan
           path: build/boot3-jakarta-migration-plan.md
 
+      - name: Build boot3 jakarta task board
+        if: always()
+        run: ./scripts/boot3-task-board.sh build/boot3-jakarta-task-board.md config/upgrade-owners.map
+
+      - name: Upload boot3 task board
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: boot3-jakarta-task-board
+          path: build/boot3-jakarta-task-board.md
+
       - name: Publish upgrade precheck summary
         if: always()
         run: |
@@ -78,6 +89,7 @@ jobs:
           echo "## Upgrade execution checklist artifact" >> "$GITHUB_STEP_SUMMARY"
           echo "- artifact: \`upgrade-execution-checklist\`" >> "$GITHUB_STEP_SUMMARY"
           echo "- artifact: \`boot3-jakarta-migration-plan\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- artifact: \`boot3-jakarta-task-board\`" >> "$GITHUB_STEP_SUMMARY"
 
   unit-and-validation-tests:
     needs: upgrade-readiness-precheck

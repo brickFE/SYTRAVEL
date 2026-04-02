@@ -91,5 +91,6 @@ CI 已配置在 `.github/workflows/ci.yml`，默认执行单元测试、控制�
 
 - 平台升级实施：Boot 1.5 -> 2.7 -> 3.x（两跳迁移）
 - 运行 `./scripts/boot3-migration-plan.sh` 生成 Jakarta 迁移批次与热点文件清单
+- 运行 `./scripts/boot3-task-board.sh` 生成按 owner 分配的迁移任务板
 - 持续补齐核心业务回归测试与鉴权覆盖
 - 前端静态资源与接口层进一步治理

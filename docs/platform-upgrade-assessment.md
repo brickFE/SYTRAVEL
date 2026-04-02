@@ -63,10 +63,13 @@
 
 - 已新增脚本：`scripts/boot3-migration-plan.sh`
 - 用途：基于仓库中 `javax.*` import 自动生成 Boot 3 / Jakarta 迁移计划与热点文件清单
+- 已新增脚本：`scripts/boot3-task-board.sh`
+- 用途：按迁移批次把 `javax.*` 文件自动映射到 owner（来自 `config/upgrade-owners.map`），生成可执行任务板
 - 本地执行示例：
 
 ```bash
 ./scripts/boot3-migration-plan.sh build/boot3-jakarta-migration-plan.md
+./scripts/boot3-task-board.sh build/boot3-jakarta-task-board.md config/upgrade-owners.map
 ```
 
-- CI 中已上传 artifact：`boot3-jakarta-migration-plan`（便于按批次推进下一阶段改造）
+- CI 中已上传 artifact：`boot3-jakarta-migration-plan`、`boot3-jakarta-task-board`（便于按批次推进下一阶段改造）
