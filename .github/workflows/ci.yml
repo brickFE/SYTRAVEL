@@ -25,7 +25,7 @@ jobs:
           cache: maven
 
       - name: Upgrade readiness precheck
-        run: ./scripts/upgrade-precheck.sh --phase jdk17 --strict --report build/upgrade-precheck-report.txt
+        run: ./scripts/upgrade-precheck.sh --phase boot3 --strict --report build/upgrade-precheck-report.txt
 
       - name: Upload upgrade precheck report
         if: always()

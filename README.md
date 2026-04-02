@@ -1,6 +1,6 @@
 # SYTRAVEL
 
-SYTRAVEL 是一个旅游业务管理系统后端项目，当前升级分支已切换到 **Spring Boot 2.7.18 + Java 17 + JPA**（下一阶段目标为 Boot 3.x / Jakarta 迁移）。  
+SYTRAVEL 是一个旅游业务管理系统后端项目，当前升级分支已切换到 **Spring Boot 3.3.5 + Java 17 + JPA**（当前阶段目标为 Boot 3 稳定化与全量回归封板）。  
 项目已完成一轮“可维护性 + 安全性”重构：请求 DTO 化、统一返回结构、全局参数校验异常处理、密码 BCrypt 迁移与权限守卫等。
 
 ---

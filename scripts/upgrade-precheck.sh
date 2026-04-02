@@ -6,7 +6,7 @@ cd "$ROOT_DIR"
 
 STRICT_MODE=0
 REPORT_FILE=""
-TARGET_PHASE="jdk17"
+TARGET_PHASE="boot3"
 MAVEN_SETTINGS_FILE="${MAVEN_SETTINGS_FILE:-}"
 if [[ -z "$MAVEN_SETTINGS_FILE" && -f ".mvn/settings-mirror.xml" ]]; then
   MAVEN_SETTINGS_FILE=".mvn/settings-mirror.xml"
@@ -158,10 +158,10 @@ if [[ "$STRICT_MODE" -eq 1 ]]; then
 fi
 
 echo "[upgrade-precheck] scanning javax.* imports (for Boot 3 migration impact sizing)..."
-JAVA_FILES_WITH_JAVAX="$(rg -n "import javax\\." src/main/java src/test/java | wc -l | tr -d ' ')"
+JAVA_FILES_WITH_JAVAX="$( (rg -n "import javax\\." src/main/java src/test/java || true) | wc -l | tr -d ' ' )"
 echo "[upgrade-precheck] javax import occurrences: $JAVA_FILES_WITH_JAVAX"
 JAVAX_HOTSPOTS="$(
-  rg -n "import javax\\." src/main/java src/test/java \
+  (rg -n "import javax\\." src/main/java src/test/java || true) \
     | cut -d: -f1 \
     | sort \
     | uniq -c \

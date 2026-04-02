@@ -79,6 +79,7 @@ mvn test
 
 - `spring-boot-starter-parent:1.5.9.RELEASE` 下载失败
 - `spring-boot-starter-parent:2.7.18` 下载失败
+- `spring-boot-starter-parent:3.3.5` 下载失败
 - Maven 输出 `status code: 403`
 
 建议：
@@ -101,7 +102,7 @@ export MAVEN_SETTINGS_FILE=$PWD/.mvn/settings-mirror.xml
 然后用同一套 settings 执行：
 
 ```bash
-./scripts/upgrade-precheck.sh --phase jdk17 --strict --report build/upgrade-precheck-report.txt
+./scripts/upgrade-precheck.sh --phase boot3 --strict --report build/upgrade-precheck-report.txt
 ./scripts/test-gate.sh smoke
 ```
 
@@ -125,22 +126,22 @@ export MAVEN_SETTINGS_FILE=$PWD/.mvn/settings-mirror.xml
 
 ## 6. 升级前预检（平台升级第一跳准备）
 
-在当前执行阶段（Boot 2.7 + JDK17）先跑一次预检脚本，快速确认运行时基线和 `javax.*` 迁移规模：
+在当前执行阶段（Boot 3 + JDK17）先跑一次预检脚本，快速确认运行时基线和兼容性指标：
 
 ```bash
-./scripts/upgrade-precheck.sh --phase jdk17
+./scripts/upgrade-precheck.sh --phase boot3
 ```
 
 CI 严格模式（用于门禁失败）：
 
 ```bash
-./scripts/upgrade-precheck.sh --phase jdk17 --strict
+./scripts/upgrade-precheck.sh --phase boot3 --strict
 ```
 
 输出报告文件（便于 CI 归档）：
 
 ```bash
-./scripts/upgrade-precheck.sh --phase jdk17 --strict --report build/upgrade-precheck-report.txt
+./scripts/upgrade-precheck.sh --phase boot3 --strict --report build/upgrade-precheck-report.txt
 ```
 
 该脚本会输出：

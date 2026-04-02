@@ -44,3 +44,4 @@
 - Batch A：已完成（`dto/rest/handler` 的 `javax.validation.*` -> `jakarta.validation.*` import 切换）
 - Batch B：已完成（`entity` 的 `javax.persistence.*` -> `jakarta.persistence.*` import 切换）
 - Batch C：已完成（`websocket` 的 `javax.websocket.*` -> `jakarta.websocket.*` import 切换）
+- Task 5：进行中（Boot Parent 已切换到 3.x，待网络可用环境完成 full 回归封板）
