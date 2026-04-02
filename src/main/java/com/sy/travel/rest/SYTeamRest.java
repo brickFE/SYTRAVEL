@@ -76,7 +76,7 @@ public class SYTeamRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/allbypid", method = RequestMethod.GET)
-	public AjaxResult<Map<String, Object>> findAllByProjectId(@RequestParam(defaultValue = "") String projectId) {
+	public AjaxResult<Map<String, Object>> findAllByProjectId(@RequestParam("projectId") @NotBlank String projectId) {
 		Map<String, Object> data = syTeamService.queryByProjectId(projectId);
 		return AjaxResult.success(data);
 	}
