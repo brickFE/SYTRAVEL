@@ -100,12 +100,28 @@ JAVAX_HOTSPOTS="$(
     | head -n 5 \
     | awk '{print $2":"$1}'
 )"
+JAVAX_CATEGORY_COUNTS="$(
+  rg -n "import javax\\." src/main/java src/test/java || true
+)"
+read -r JAVAX_SERVLET_COUNT JAVAX_VALIDATION_COUNT JAVAX_PERSISTENCE_COUNT JAVAX_WEBSOCKET_COUNT JAVAX_ANNOTATION_COUNT JAVAX_OTHER_COUNT <<EOF
+$(echo "$JAVAX_CATEGORY_COUNTS" | awk '
+BEGIN {servlet=0; validation=0; persistence=0; websocket=0; annotation=0; other=0}
+/import javax\.servlet\./ {servlet++; next}
+/import javax\.validation\./ {validation++; next}
+/import javax\.persistence\./ {persistence++; next}
+/import javax\.websocket\./ {websocket++; next}
+/import javax\.annotation\./ {annotation++; next}
+/import javax\./ {other++; next}
+END {print servlet, validation, persistence, websocket, annotation, other}
+')
+EOF
 if [[ -n "$JAVAX_HOTSPOTS" ]]; then
   echo "[upgrade-precheck] top javax hotspots:"
   echo "$JAVAX_HOTSPOTS" | while read -r line; do
     echo "[upgrade-precheck]   $line"
   done
 fi
+echo "[upgrade-precheck] javax categories: servlet=${JAVAX_SERVLET_COUNT}, validation=${JAVAX_VALIDATION_COUNT}, persistence=${JAVAX_PERSISTENCE_COUNT}, websocket=${JAVAX_WEBSOCKET_COUNT}, annotation=${JAVAX_ANNOTATION_COUNT}, other=${JAVAX_OTHER_COUNT}"
 
 if [[ -n "$REPORT_FILE" ]]; then
   mkdir -p "$(dirname "$REPORT_FILE")"
@@ -118,6 +134,12 @@ if [[ -n "$REPORT_FILE" ]]; then
     echo "pom_java_version=${POM_JAVA_VERSION:-unknown}"
     echo "spring_boot_parent=${BOOT_PARENT_VERSION:-unknown}"
     echo "javax_import_occurrences=$JAVA_FILES_WITH_JAVAX"
+    echo "javax_servlet_count=$JAVAX_SERVLET_COUNT"
+    echo "javax_validation_count=$JAVAX_VALIDATION_COUNT"
+    echo "javax_persistence_count=$JAVAX_PERSISTENCE_COUNT"
+    echo "javax_websocket_count=$JAVAX_WEBSOCKET_COUNT"
+    echo "javax_annotation_count=$JAVAX_ANNOTATION_COUNT"
+    echo "javax_other_count=$JAVAX_OTHER_COUNT"
     idx=1
     echo "$JAVAX_HOTSPOTS" | while read -r hotspot; do
       if [[ -n "$hotspot" ]]; then

@@ -63,6 +63,12 @@ JAVA_MAJOR="$(get_value java_major)"
 POM_JAVA_VERSION="$(get_value pom_java_version)"
 BOOT_PARENT="$(get_value spring_boot_parent)"
 JAVAX_COUNT="$(get_value javax_import_occurrences)"
+JAVAX_SERVLET_COUNT="$(get_value javax_servlet_count)"
+JAVAX_VALIDATION_COUNT="$(get_value javax_validation_count)"
+JAVAX_PERSISTENCE_COUNT="$(get_value javax_persistence_count)"
+JAVAX_WEBSOCKET_COUNT="$(get_value javax_websocket_count)"
+JAVAX_ANNOTATION_COUNT="$(get_value javax_annotation_count)"
+JAVAX_OTHER_COUNT="$(get_value javax_other_count)"
 
 mkdir -p "$(dirname "$OUT_FILE")"
 UNMAPPED_COUNT=0
@@ -76,6 +82,7 @@ UNMAPPED_COUNT=0
   echo "- pom java.version: \`${POM_JAVA_VERSION:-unknown}\`"
   echo "- spring boot parent: \`${BOOT_PARENT:-unknown}\`"
   echo "- javax import occurrences: \`${JAVAX_COUNT:-unknown}\`"
+  echo "- javax category breakdown: servlet=\`${JAVAX_SERVLET_COUNT:-0}\`, validation=\`${JAVAX_VALIDATION_COUNT:-0}\`, persistence=\`${JAVAX_PERSISTENCE_COUNT:-0}\`, websocket=\`${JAVAX_WEBSOCKET_COUNT:-0}\`, annotation=\`${JAVAX_ANNOTATION_COUNT:-0}\`, other=\`${JAVAX_OTHER_COUNT:-0}\`"
   echo
   echo "## Phase 1 - Baseline Lock"
   echo "- [ ] Ensure CI strict precheck is green on PR branch"
