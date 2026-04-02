@@ -59,11 +59,16 @@ public class SYWebsocketService {
 	
 	@OnClose
 	public void onClose(Session session, CloseReason closeReason) {
+		if (scheduledService != null) {
+			scheduledService.shutdownNow();
+		}
 	}
 	
 	@OnError
 	public void onError(Throwable t) {
-		
+		if (scheduledService != null) {
+			scheduledService.shutdownNow();
+		}
 	}
 	
 	public AjaxResult<Map<String, Object>> getMonitor(){
@@ -75,13 +80,13 @@ public class SYWebsocketService {
 			resultMap.put("project", (List<Map<String,Object>>)projectMap.get("documents"));
 		}
 		Map<String,Object> teamMap = SYWebsocketService.syTeamService.findAll("",1,Integer.MAX_VALUE);
-		if(projectMap == null) {
+		if(teamMap == null) {
 			resultMap.put("team", new ArrayList<>());
 		} else {
 			resultMap.put("team", (List<Map<String,Object>>)teamMap.get("documents"));
 		}
 		Map<String,Object> productMap = SYWebsocketService.syProductService.findAll("", 1, Integer.MAX_VALUE);
-		if(projectMap == null) {
+		if(productMap == null) {
 			resultMap.put("product", new ArrayList<>());
 		} else {
 			resultMap.put("product", (List<Map<String,Object>>)productMap.get("documents"));
