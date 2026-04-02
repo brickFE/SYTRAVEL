@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.sy.travel.common.AjaxResult;
+import com.sy.travel.common.ApiMessages;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -41,6 +42,6 @@ public class GlobalExceptionHandler {
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	@ResponseBody
 	public AjaxResult<String> handleUnexpected(Exception ex) {
-		return AjaxResult.internalError(ex.getMessage());
+		return AjaxResult.internalError(ApiMessages.INTERNAL_ERROR_MESSAGE);
 	}
 }
