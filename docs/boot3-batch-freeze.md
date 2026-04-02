@@ -45,3 +45,21 @@
 - Batch B：已完成（`entity` 的 `javax.persistence.*` -> `jakarta.persistence.*` import 切换）
 - Batch C：已完成（`websocket` 的 `javax.websocket.*` -> `jakarta.websocket.*` import 切换）
 - Task 5：进行中（Boot Parent 已切换到 3.x，待网络可用环境完成 full 回归封板）
+
+## 6) Task 1 执行指令（新增）
+
+为避免“批次范围冻结”只停留在文档，仓库新增了自动检查脚本：
+
+```bash
+# 检查某个提交范围是否只改动当前批次允许目录
+./scripts/boot3-freeze-guard.sh A origin/main HEAD
+./scripts/boot3-freeze-guard.sh B origin/main HEAD
+./scripts/boot3-freeze-guard.sh C origin/main HEAD
+```
+
+说明：
+- A 仅允许改动 `dto/rest/handler`
+- B 仅允许改动 `entity`
+- C 仅允许改动 `SYWebsocketService.java`
+- 通过后再执行对应验收门槛（`test-gate.sh`）
+
