@@ -59,6 +59,12 @@ public class SYProductRestValidationTest {
 	}
 
 	@Test
+	public void deleteShouldReturnBadRequestWhenOperatorBlank() throws Exception {
+		mockMvc.perform(get("/sy/product/delete").param("id", "1").param("operator", " "))
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
+	}
+
+	@Test
 	public void queryByTeamIdShouldReturnBadRequestWhenIdInvalid() throws Exception {
 		mockMvc.perform(get("/sy/product/teamid").param("id", "0"))
 				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));

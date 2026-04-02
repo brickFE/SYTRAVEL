@@ -59,6 +59,12 @@ public class SYTeamRestValidationTest {
 	}
 
 	@Test
+	public void deleteByTeamIdShouldReturnBadRequestWhenOperatorBlank() throws Exception {
+		mockMvc.perform(get("/sy/team/delete").param("id", "1").param("operator", " "))
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
+	}
+
+	@Test
 	public void infoShouldReturnBadRequestWhenIdInvalid() throws Exception {
 		mockMvc.perform(get("/sy/team/info").param("id", "0"))
 				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
