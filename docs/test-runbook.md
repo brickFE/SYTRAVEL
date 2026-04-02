@@ -108,7 +108,8 @@ export MAVEN_SETTINGS_FILE=$PWD/.mvn/settings-mirror.xml
 说明：
 
 - `MAVEN_SETTINGS_FILE` 已被 `upgrade-precheck.sh` 与 `test-gate.sh` 支持。
-- `<你的可访问仓库地址>` 建议填写公司 Nexus/Artifactory 的 Maven 代理地址（最稳妥）。
+- 仓库默认提供 `.mvn/settings-mirror.xml`，镜像地址为 `https://maven.aliyun.com/repository/public`。
+- `<你的可访问仓库地址>` 更建议填写公司 Nexus/Artifactory 的 Maven 代理地址（最稳妥）。
 - 若你已经有 `~/.m2/settings.xml`，也可直接 `export MAVEN_SETTINGS_FILE=~/.m2/settings.xml`。
 
 ## 5. CI 建议

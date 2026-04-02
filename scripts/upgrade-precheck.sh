@@ -8,6 +8,9 @@ STRICT_MODE=0
 REPORT_FILE=""
 TARGET_PHASE="jdk17"
 MAVEN_SETTINGS_FILE="${MAVEN_SETTINGS_FILE:-}"
+if [[ -z "$MAVEN_SETTINGS_FILE" && -f ".mvn/settings-mirror.xml" ]]; then
+  MAVEN_SETTINGS_FILE=".mvn/settings-mirror.xml"
+fi
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --phase)

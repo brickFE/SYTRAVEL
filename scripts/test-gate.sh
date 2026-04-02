@@ -5,6 +5,9 @@ MODE="${1:-smoke}"
 TMP_LOG="$(mktemp)"
 trap 'rm -f "${TMP_LOG}"' EXIT
 MAVEN_SETTINGS_FILE="${MAVEN_SETTINGS_FILE:-}"
+if [[ -z "$MAVEN_SETTINGS_FILE" && -f ".mvn/settings-mirror.xml" ]]; then
+  MAVEN_SETTINGS_FILE=".mvn/settings-mirror.xml"
+fi
 
 UNIT_TESTS="PasswordSupportTest,SYLoginServiceTest,SYUserServiceTest,PermissionGuardTest,SYWebsocketServiceTest,GlobalExceptionHandlerTest"
 VALIDATION_TESTS="SYLoginRestValidationTest,SYUserRestValidationTest,SYProjectRestValidationTest,SYTeamRestValidationTest,SYProductRestValidationTest,SYRoleRestValidationTest,SYClassesRestValidationTest,SYLoggerRestValidationTest"

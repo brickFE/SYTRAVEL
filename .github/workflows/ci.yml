@@ -11,6 +11,8 @@ on:
 jobs:
   upgrade-readiness-precheck:
     runs-on: ubuntu-latest
+    env:
+      MAVEN_SETTINGS_FILE: .mvn/settings-mirror.xml
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -68,6 +70,8 @@ jobs:
   unit-and-validation-tests:
     needs: upgrade-readiness-precheck
     runs-on: ubuntu-latest
+    env:
+      MAVEN_SETTINGS_FILE: .mvn/settings-mirror.xml
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -85,6 +89,8 @@ jobs:
   full-regression:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    env:
+      MAVEN_SETTINGS_FILE: .mvn/settings-mirror.xml
     steps:
       - name: Checkout
         uses: actions/checkout@v4

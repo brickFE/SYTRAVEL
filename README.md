@@ -75,6 +75,8 @@ export MAVEN_SETTINGS_FILE=$PWD/.mvn/settings-mirror.xml
 ./scripts/test-gate.sh smoke
 ```
 
+仓库已内置 `.mvn/settings-mirror.xml`（阿里云公共镜像）；若你的网络可访问该地址可直接使用，不可访问时再替换为公司私有镜像。
+
 CI 已配置在 `.github/workflows/ci.yml`，默认执行单元测试、控制器参数校验测试，并在主分支执行全量回归。
 
 推荐使用统一测试入口脚本：
