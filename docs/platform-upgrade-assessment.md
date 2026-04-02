@@ -6,7 +6,7 @@
 ## 1. 当前基线
 
 - 主线：Spring Boot `1.5.9.RELEASE` + JDK `8`
-- 升级分支（进行中）：Spring Boot `2.7.18` + JDK `11`
+- 升级分支（进行中）：Spring Boot `2.7.18` + JDK `17`
 - Spring Data JPA + 传统 Servlet API + WebSocket
 - 前后端耦合较深，接口历史兼容要求较高
 
@@ -54,7 +54,7 @@
 
 ### 下一步（升级执行前）
 
-1. 在当前升级分支上完成 Boot 2.7 + JDK11 的编译、测试与配置收敛  
-2. 将 Java 基线从 11 提升到 JDK17 并处理编译告警  
-3. 规划并执行 Boot 3.x 的 `javax` -> `jakarta` 分阶段迁移  
+1. 在当前升级分支上完成 Boot 2.7 + JDK17 的编译、测试与配置收敛  
+2. 规划并执行 Boot 3.x 的 `javax` -> `jakarta` 分阶段迁移  
+3. 建立 Boot 3 迁移专用回归集并持续跟踪兼容阻塞  
 4. 以登录/用户/项目/团队/产品/角色/分类回归集作为强制验收门槛

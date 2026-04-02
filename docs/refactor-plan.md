@@ -4,7 +4,7 @@
 
 ## 0. 现状快照
 
-- 后端主线曾基于 Spring Boot 1.5.9 + Java 8，升级分支已开始迁移到 Spring Boot 2.7.18 + Java 11。  
+- 后端主线曾基于 Spring Boot 1.5.9 + Java 8，升级分支已开始迁移到 Spring Boot 2.7.18 + Java 17。  
 - Controller/Service 层存在大量重复样板代码（分页、参数校验、日志结果组装）。  
 - 密码处理为 Base64 编码（非加密），存在明显安全风险。  
 - 前端为传统 jQuery + 多版本脚本混用，静态资源结构分散。  

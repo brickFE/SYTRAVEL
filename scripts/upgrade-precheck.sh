@@ -6,7 +6,7 @@ cd "$ROOT_DIR"
 
 STRICT_MODE=0
 REPORT_FILE=""
-TARGET_PHASE="boot27-jdk11"
+TARGET_PHASE="jdk17"
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --phase)

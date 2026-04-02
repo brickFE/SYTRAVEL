@@ -15,15 +15,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup JDK 11
+      - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '11'
+          java-version: '17'
           cache: maven
 
       - name: Upgrade readiness precheck
-        run: ./scripts/upgrade-precheck.sh --phase boot27-jdk11 --strict --report build/upgrade-precheck-report.txt
+        run: ./scripts/upgrade-precheck.sh --phase jdk17 --strict --report build/upgrade-precheck-report.txt
 
       - name: Upload upgrade precheck report
         if: always()
@@ -72,11 +72,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup JDK 11
+      - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '11'
+          java-version: '17'
           cache: maven
 
       - name: Smoke gate
@@ -89,24 +89,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup JDK 11
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '11'
-          cache: maven
-
-      - name: Full test suite
-        run: ./scripts/test-gate.sh full
-
-  jdk17-compatibility:
-    needs: unit-and-validation-tests
-    runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
@@ -114,5 +96,5 @@ jobs:
           java-version: '17'
           cache: maven
 
-      - name: JDK 17 compatibility smoke
-        run: ./scripts/test-gate.sh unit
+      - name: Full test suite
+        run: ./scripts/test-gate.sh full

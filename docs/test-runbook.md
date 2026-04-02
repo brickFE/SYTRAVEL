@@ -102,22 +102,22 @@ mvn test
 
 ## 6. 升级前预检（平台升级第一跳准备）
 
-在当前执行阶段（Boot 2.7 + JDK11）先跑一次预检脚本，快速确认运行时基线和 `javax.*` 迁移规模：
+在当前执行阶段（Boot 2.7 + JDK17）先跑一次预检脚本，快速确认运行时基线和 `javax.*` 迁移规模：
 
 ```bash
-./scripts/upgrade-precheck.sh --phase boot27-jdk11
+./scripts/upgrade-precheck.sh --phase jdk17
 ```
 
 CI 严格模式（用于门禁失败）：
 
 ```bash
-./scripts/upgrade-precheck.sh --phase boot27-jdk11 --strict
+./scripts/upgrade-precheck.sh --phase jdk17 --strict
 ```
 
 输出报告文件（便于 CI 归档）：
 
 ```bash
-./scripts/upgrade-precheck.sh --phase boot27-jdk11 --strict --report build/upgrade-precheck-report.txt
+./scripts/upgrade-precheck.sh --phase jdk17 --strict --report build/upgrade-precheck-report.txt
 ```
 
 该脚本会输出：

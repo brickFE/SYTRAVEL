@@ -104,7 +104,7 @@ UNMAPPED_COUNT=0
     echo "- [ ] Batch D (Misc): remaining \`javax.*\` imports [owner: backend-core]"
   fi
   echo
-  echo "## Phase 1 - Current Baseline Stabilization (Boot 2.7 + JDK11)"
+  echo "## Phase 1 - Current Baseline Stabilization (Boot 2.7 + JDK17)"
   echo "- [ ] Ensure CI strict precheck is green on PR branch"
   echo "- [ ] Confirm runtime Java and pom java.version are aligned with current target phase"
   echo "- [ ] Confirm Spring Boot parent stays on 2.7.x during current phase"
