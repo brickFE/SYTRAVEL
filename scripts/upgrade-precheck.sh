@@ -91,6 +91,21 @@ fi
 echo "[upgrade-precheck] scanning javax.* imports (for Boot 3 migration impact sizing)..."
 JAVA_FILES_WITH_JAVAX="$(rg -n "import javax\\." src/main/java src/test/java | wc -l | tr -d ' ')"
 echo "[upgrade-precheck] javax import occurrences: $JAVA_FILES_WITH_JAVAX"
+JAVAX_HOTSPOTS="$(
+  rg -n "import javax\\." src/main/java src/test/java \
+    | cut -d: -f1 \
+    | sort \
+    | uniq -c \
+    | sort -nr \
+    | head -n 5 \
+    | awk '{print $2":"$1}'
+)"
+if [[ -n "$JAVAX_HOTSPOTS" ]]; then
+  echo "[upgrade-precheck] top javax hotspots:"
+  echo "$JAVAX_HOTSPOTS" | while read -r line; do
+    echo "[upgrade-precheck]   $line"
+  done
+fi
 
 if [[ -n "$REPORT_FILE" ]]; then
   mkdir -p "$(dirname "$REPORT_FILE")"
@@ -103,6 +118,13 @@ if [[ -n "$REPORT_FILE" ]]; then
     echo "pom_java_version=${POM_JAVA_VERSION:-unknown}"
     echo "spring_boot_parent=${BOOT_PARENT_VERSION:-unknown}"
     echo "javax_import_occurrences=$JAVA_FILES_WITH_JAVAX"
+    idx=1
+    echo "$JAVAX_HOTSPOTS" | while read -r hotspot; do
+      if [[ -n "$hotspot" ]]; then
+        echo "javax_hotspot_${idx}=$hotspot"
+        idx=$((idx + 1))
+      fi
+    done
   } > "$REPORT_FILE"
   echo "[upgrade-precheck] report written: $REPORT_FILE"
 fi

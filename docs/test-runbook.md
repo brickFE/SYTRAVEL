@@ -122,6 +122,7 @@ CI 严格模式（用于门禁失败）：
 - 本地 Java / Maven 版本
 - `pom.xml` 中 `java.version` 与 Spring Boot Parent 版本
 - `javax.*` import 的出现次数（用于评估后续 Boot 3/Jakarta 改造工作量）
+- `javax.*` import 热点文件 Top N（用于升级分工和优先级排序）
 
 在 CI 中，预检结果会同时：
 
