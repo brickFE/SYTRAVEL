@@ -9,7 +9,24 @@ on:
       - work
 
 jobs:
+  upgrade-readiness-precheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+          cache: maven
+
+      - name: Upgrade readiness precheck
+        run: ./scripts/upgrade-precheck.sh
+
   unit-and-validation-tests:
+    needs: upgrade-readiness-precheck
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
