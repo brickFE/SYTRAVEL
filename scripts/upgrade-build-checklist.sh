@@ -19,6 +19,17 @@ get_value() {
   grep -E "^${key}=" "$REPORT_FILE" | head -n 1 | cut -d= -f2-
 }
 
+risk_level_for_hotspot() {
+  local hotspot="$1"
+  case "$hotspot" in
+    src/main/java/com/sy/travel/service/*) echo "HIGH" ;;
+    src/main/java/com/sy/travel/rest/*) echo "MEDIUM" ;;
+    src/main/java/com/sy/travel/*) echo "MEDIUM" ;;
+    src/test/java/*) echo "LOW" ;;
+    *) echo "MEDIUM" ;;
+  esac
+}
+
 STRICT_MODE="$(get_value upgrade_precheck_strict_mode)"
 STRICT_FAILED="$(get_value upgrade_precheck_strict_failed)"
 JAVA_MAJOR="$(get_value java_major)"
@@ -47,7 +58,10 @@ mkdir -p "$(dirname "$OUT_FILE")"
   for i in 1 2 3 4 5; do
     hotspot="$(get_value "javax_hotspot_${i}")"
     if [[ -n "$hotspot" ]]; then
-      echo "- [ ] hotspot ${i}: \`${hotspot}\`"
+      hotspot_path="${hotspot%%:*}"
+      hotspot_count="${hotspot##*:}"
+      risk_level="$(risk_level_for_hotspot "$hotspot_path")"
+      echo "- [ ] hotspot ${i}: \`${hotspot_path}\` (imports: ${hotspot_count}, risk: ${risk_level}, owner: _TBD_)"
     fi
   done
   echo
