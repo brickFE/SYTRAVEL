@@ -81,4 +81,10 @@ public class SYTeamRestValidationTest {
 		mockMvc.perform(get("/sy/team/info").param("id", "0"))
 				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
 	}
+
+	@Test
+	public void infoShouldReturnBadRequestWhenIdNotNumber() throws Exception {
+		mockMvc.perform(get("/sy/team/info").param("id", "abc"))
+				.andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
+	}
 }

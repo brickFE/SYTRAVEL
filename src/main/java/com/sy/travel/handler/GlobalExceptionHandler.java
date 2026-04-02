@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.sy.travel.common.AjaxResult;
 
@@ -26,7 +27,10 @@ public class GlobalExceptionHandler {
 		return AjaxResult.validationError(message);
 	}
 
-	@ExceptionHandler({ ConstraintViolationException.class, MissingServletRequestParameterException.class })
+	@ExceptionHandler({
+			ConstraintViolationException.class,
+			MissingServletRequestParameterException.class,
+			MethodArgumentTypeMismatchException.class })
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
 	public AjaxResult<String> handleBadRequest(Exception ex) {
