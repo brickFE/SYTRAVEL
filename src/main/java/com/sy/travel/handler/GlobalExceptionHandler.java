@@ -2,7 +2,10 @@ package com.sy.travel.handler;
 
 import java.util.stream.Collectors;
 
+import javax.validation.ConstraintViolationException;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,6 +24,13 @@ public class GlobalExceptionHandler {
 		String message = ex.getBindingResult().getFieldErrors().stream().map(fieldError -> fieldError.getDefaultMessage())
 				.collect(Collectors.joining(";"));
 		return AjaxResult.validationError(message);
+	}
+
+	@ExceptionHandler({ ConstraintViolationException.class, MissingServletRequestParameterException.class })
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseBody
+	public AjaxResult<String> handleBadRequest(Exception ex) {
+		return AjaxResult.validationError(ex.getMessage());
 	}
 
 	@ExceptionHandler(Exception.class)
