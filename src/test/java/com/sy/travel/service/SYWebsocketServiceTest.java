@@ -107,6 +107,27 @@ public class SYWebsocketServiceTest {
 	}
 
 	@Test
+	public void getMonitorShouldReturnEmptyWhenDocumentsTypeIsInvalid() {
+		SYProjectService projectService = mock(SYProjectService.class);
+		SYTeamService teamService = mock(SYTeamService.class);
+		SYProductService productService = mock(SYProductService.class);
+
+		Map<String, Object> invalid = new HashMap<>();
+		invalid.put("documents", "invalid");
+		when(projectService.queryAll("", 1, Integer.MAX_VALUE)).thenReturn(invalid);
+		when(teamService.findAll("", 1, Integer.MAX_VALUE)).thenReturn(invalid);
+		when(productService.findAll("", 1, Integer.MAX_VALUE)).thenReturn(invalid);
+
+		SYWebsocketService service = new SYWebsocketService();
+		service.get(projectService, teamService, productService);
+
+		AjaxResult<Map<String, Object>> result = service.getMonitor();
+		assertTrue(((List<?>) result.getData().get("project")).isEmpty());
+		assertTrue(((List<?>) result.getData().get("team")).isEmpty());
+		assertTrue(((List<?>) result.getData().get("product")).isEmpty());
+	}
+
+	@Test
 	public void onCloseShouldCancelTaskAndShutdownScheduler() throws Exception {
 		SYWebsocketService service = new SYWebsocketService();
 		ScheduledFuture<?> future = mock(ScheduledFuture.class);
@@ -118,6 +139,8 @@ public class SYWebsocketServiceTest {
 
 		verify(future).cancel(true);
 		verify(executorService).shutdownNow();
+		assertEquals(null, getField(service, "monitorTask"));
+		assertEquals(null, getField(service, "scheduledService"));
 	}
 
 	@Test
@@ -151,6 +174,12 @@ public class SYWebsocketServiceTest {
 		Field field = target.getClass().getDeclaredField(fieldName);
 		field.setAccessible(true);
 		field.set(target, value);
+	}
+
+	private Object getField(Object target, String fieldName) throws Exception {
+		Field field = target.getClass().getDeclaredField(fieldName);
+		field.setAccessible(true);
+		return field.get(target);
 	}
 
 	private void setStaticField(Class<?> type, String fieldName, Object value) throws Exception {

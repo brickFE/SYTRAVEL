@@ -36,11 +36,17 @@ public class SYWebsocketService {
 	private static SYProductService syProductService;
 	private ScheduledExecutorService scheduledService;
 	private ScheduledFuture<?> monitorTask;
+	private boolean projectServiceUnavailableLogged;
+	private boolean teamServiceUnavailableLogged;
+	private boolean productServiceUnavailableLogged;
 	@Autowired
 	public void get(SYProjectService sYProjectService, SYTeamService syTeamService, SYProductService syProductService) {
 		SYWebsocketService.sYProjectService = sYProjectService;
 		SYWebsocketService.syTeamService = syTeamService;
 		SYWebsocketService.syProductService = syProductService;
+		projectServiceUnavailableLogged = false;
+		teamServiceUnavailableLogged = false;
+		productServiceUnavailableLogged = false;
 	}
 	@OnOpen
 	public void onOpen(Session session){
@@ -88,7 +94,9 @@ public class SYWebsocketService {
 		cancelMonitorTask();
 		if (scheduledService != null) {
 			scheduledService.shutdownNow();
+			scheduledService = null;
 		}
+		monitorTask = null;
 	}
 
 	private void cancelMonitorTask() {
@@ -109,21 +117,24 @@ public class SYWebsocketService {
 	public AjaxResult<Map<String, Object>> getMonitor(){
 		Map<String,Object> resultMap = new HashMap<>();
 		if (SYWebsocketService.sYProjectService == null) {
-			LOGGER.warn("project service is unavailable, fallback to empty monitor data");
+			logServiceUnavailableOnce("project", projectServiceUnavailableLogged);
+			projectServiceUnavailableLogged = true;
 			resultMap.put("project", new ArrayList<>());
 		} else {
 			Map<String,Object> projectMap = SYWebsocketService.sYProjectService.queryAll("",1, Integer.MAX_VALUE);
 			resultMap.put("project", extractDocuments(projectMap));
 		}
 		if (SYWebsocketService.syTeamService == null) {
-			LOGGER.warn("team service is unavailable, fallback to empty monitor data");
+			logServiceUnavailableOnce("team", teamServiceUnavailableLogged);
+			teamServiceUnavailableLogged = true;
 			resultMap.put("team", new ArrayList<>());
 		} else {
 			Map<String,Object> teamMap = SYWebsocketService.syTeamService.findAll("",1,Integer.MAX_VALUE);
 			resultMap.put("team", extractDocuments(teamMap));
 		}
 		if (SYWebsocketService.syProductService == null) {
-			LOGGER.warn("product service is unavailable, fallback to empty monitor data");
+			logServiceUnavailableOnce("product", productServiceUnavailableLogged);
+			productServiceUnavailableLogged = true;
 			resultMap.put("product", new ArrayList<>());
 		} else {
 			Map<String,Object> productMap = SYWebsocketService.syProductService.findAll("", 1, Integer.MAX_VALUE);
@@ -141,5 +152,11 @@ public class SYWebsocketService {
 			return (List<Map<String, Object>>) documents;
 		}
 		return new ArrayList<>();
+	}
+
+	private void logServiceUnavailableOnce(String name, boolean logged) {
+		if (!logged) {
+			LOGGER.warn("{} service is unavailable, fallback to empty monitor data", name);
+		}
 	}
 }
