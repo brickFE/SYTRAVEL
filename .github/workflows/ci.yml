@@ -32,6 +32,18 @@ jobs:
           name: upgrade-precheck-report
           path: build/upgrade-precheck-report.txt
 
+      - name: Publish upgrade precheck summary
+        if: always()
+        run: |
+          echo "## Upgrade readiness precheck" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f build/upgrade-precheck-report.txt ]; then
+            while IFS='=' read -r key value; do
+              echo "- \`${key}\`: ${value}" >> "$GITHUB_STEP_SUMMARY"
+            done < build/upgrade-precheck-report.txt
+          else
+            echo "- report not found" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
   unit-and-validation-tests:
     needs: upgrade-readiness-precheck
     runs-on: ubuntu-latest
