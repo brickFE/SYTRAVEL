@@ -1,0 +1,5 @@
+# glob-pattern=owner
+src/main/java/com/sy/travel/service/*=backend-core
+src/main/java/com/sy/travel/rest/*=backend-api
+src/main/java/com/sy/travel/common/*=backend-platform
+src/test/java/*=qa-automation

@@ -2,12 +2,13 @@
 set -euo pipefail
 
 if [[ $# -lt 2 ]]; then
-  echo "Usage: $0 <precheck-report-file> <output-markdown-file>"
+  echo "Usage: $0 <precheck-report-file> <output-markdown-file> [owners-map-file]"
   exit 2
 fi
 
 REPORT_FILE="$1"
 OUT_FILE="$2"
+OWNERS_MAP_FILE="${3:-config/upgrade-owners.map}"
 
 if [[ ! -f "$REPORT_FILE" ]]; then
   echo "[upgrade-build-checklist] ERROR: report file not found: $REPORT_FILE"
@@ -28,6 +29,24 @@ risk_level_for_hotspot() {
     src/test/java/*) echo "LOW" ;;
     *) echo "MEDIUM" ;;
   esac
+}
+
+owner_for_hotspot() {
+  local hotspot="$1"
+  if [[ ! -f "$OWNERS_MAP_FILE" ]]; then
+    echo "TBD"
+    return
+  fi
+  while IFS= read -r line; do
+    [[ -z "$line" || "$line" =~ ^# ]] && continue
+    pattern="${line%%=*}"
+    owner="${line#*=}"
+    if [[ "$hotspot" == $pattern ]]; then
+      echo "$owner"
+      return
+    fi
+  done < "$OWNERS_MAP_FILE"
+  echo "TBD"
 }
 
 STRICT_MODE="$(get_value upgrade_precheck_strict_mode)"
@@ -61,7 +80,8 @@ mkdir -p "$(dirname "$OUT_FILE")"
       hotspot_path="${hotspot%%:*}"
       hotspot_count="${hotspot##*:}"
       risk_level="$(risk_level_for_hotspot "$hotspot_path")"
-      echo "- [ ] hotspot ${i}: \`${hotspot_path}\` (imports: ${hotspot_count}, risk: ${risk_level}, owner: _TBD_)"
+      hotspot_owner="$(owner_for_hotspot "$hotspot_path")"
+      echo "- [ ] hotspot ${i}: \`${hotspot_path}\` (imports: ${hotspot_count}, risk: ${risk_level}, owner: ${hotspot_owner})"
     fi
   done
   echo

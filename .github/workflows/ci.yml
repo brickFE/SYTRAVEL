@@ -34,7 +34,7 @@ jobs:
 
       - name: Build upgrade execution checklist
         if: always()
-        run: ./scripts/upgrade-build-checklist.sh build/upgrade-precheck-report.txt build/upgrade-execution-checklist.md
+        run: ./scripts/upgrade-build-checklist.sh build/upgrade-precheck-report.txt build/upgrade-execution-checklist.md config/upgrade-owners.map
 
       - name: Upload upgrade execution checklist
         if: always()
