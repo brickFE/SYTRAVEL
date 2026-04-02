@@ -128,9 +128,19 @@ match_parent_version() {
 RUNTIME_OK=1
 POM_JAVA_OK=1
 BOOT_PARENT_OK=1
-if [[ "${JAVA_MAJOR:-}" != "$EXPECTED_JAVA_MAJOR" ]]; then
-  echo "[upgrade-precheck] WARN: expected runtime Java major $EXPECTED_JAVA_MAJOR, got ${JAVA_MAJOR:-unknown}"
+if [[ -z "${JAVA_MAJOR:-}" ]]; then
+  echo "[upgrade-precheck] WARN: runtime Java major is unknown"
   RUNTIME_OK=0
+elif [[ "$TARGET_PHASE" == "boot3" ]]; then
+  if [[ "$JAVA_MAJOR" -lt "$EXPECTED_JAVA_MAJOR" ]]; then
+    echo "[upgrade-precheck] WARN: expected runtime Java major >= $EXPECTED_JAVA_MAJOR for boot3, got ${JAVA_MAJOR:-unknown}"
+    RUNTIME_OK=0
+  fi
+else
+  if [[ "${JAVA_MAJOR:-}" != "$EXPECTED_JAVA_MAJOR" ]]; then
+    echo "[upgrade-precheck] WARN: expected runtime Java major $EXPECTED_JAVA_MAJOR, got ${JAVA_MAJOR:-unknown}"
+    RUNTIME_OK=0
+  fi
 fi
 if [[ "${POM_JAVA_VERSION:-}" != "$EXPECTED_POM_JAVA" ]]; then
   echo "[upgrade-precheck] WARN: expected pom java.version=$EXPECTED_POM_JAVA, got ${POM_JAVA_VERSION:-unknown}"
