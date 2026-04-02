@@ -23,7 +23,7 @@ jobs:
           cache: maven
 
       - name: Upgrade readiness precheck
-        run: ./scripts/upgrade-precheck.sh
+        run: ./scripts/upgrade-precheck.sh --strict
 
   unit-and-validation-tests:
     needs: upgrade-readiness-precheck

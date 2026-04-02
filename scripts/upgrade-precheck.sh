@@ -4,6 +4,11 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
+STRICT_MODE=0
+if [[ "${1:-}" == "--strict" ]]; then
+  STRICT_MODE=1
+fi
+
 echo "[upgrade-precheck] project: $ROOT_DIR"
 
 if ! command -v java >/dev/null 2>&1; then
@@ -18,6 +23,8 @@ fi
 
 JAVA_VERSION_RAW="$(java -version 2>&1 | head -n 1)"
 MVN_VERSION_RAW="$(mvn -v 2>/dev/null | head -n 1)"
+JAVA_VERSION_TOKEN="$(echo "$JAVA_VERSION_RAW" | awk -F'"' '{print $2}')"
+JAVA_MAJOR="$(echo "$JAVA_VERSION_TOKEN" | awk -F. '{if ($1 == "1") print $2; else print $1}')"
 
 echo "[upgrade-precheck] java: $JAVA_VERSION_RAW"
 echo "[upgrade-precheck] maven: $MVN_VERSION_RAW"
@@ -45,6 +52,26 @@ fi
 
 if [[ "${BOOT_PARENT_VERSION:-}" != "1.5.9.RELEASE" ]]; then
   echo "[upgrade-precheck] WARN: expected current parent spring-boot-starter-parent=1.5.9.RELEASE"
+fi
+
+if [[ "$STRICT_MODE" -eq 1 ]]; then
+  STRICT_FAILED=0
+  if [[ "${JAVA_MAJOR:-}" != "8" ]]; then
+    echo "[upgrade-precheck] STRICT-ERROR: expected runtime Java major version 8, got ${JAVA_MAJOR:-unknown}"
+    STRICT_FAILED=1
+  fi
+  if [[ "${POM_JAVA_VERSION:-}" != "1.8" ]]; then
+    echo "[upgrade-precheck] STRICT-ERROR: expected pom java.version=1.8"
+    STRICT_FAILED=1
+  fi
+  if [[ "${BOOT_PARENT_VERSION:-}" != "1.5.9.RELEASE" ]]; then
+    echo "[upgrade-precheck] STRICT-ERROR: expected spring-boot-starter-parent=1.5.9.RELEASE"
+    STRICT_FAILED=1
+  fi
+  if [[ "$STRICT_FAILED" -eq 1 ]]; then
+    echo "[upgrade-precheck] strict check failed"
+    exit 1
+  fi
 fi
 
 echo "[upgrade-precheck] scanning javax.* imports (for Boot 3 migration impact sizing)..."

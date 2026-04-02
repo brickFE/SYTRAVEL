@@ -105,6 +105,12 @@ mvn test
 ./scripts/upgrade-precheck.sh
 ```
 
+CI 严格模式（用于门禁失败）：
+
+```bash
+./scripts/upgrade-precheck.sh --strict
+```
+
 该脚本会输出：
 
 - 本地 Java / Maven 版本
