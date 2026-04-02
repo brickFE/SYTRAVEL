@@ -7,6 +7,7 @@ cd "$ROOT_DIR"
 STRICT_MODE=0
 REPORT_FILE=""
 TARGET_PHASE="jdk17"
+MAVEN_SETTINGS_FILE="${MAVEN_SETTINGS_FILE:-}"
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --phase)
@@ -49,8 +50,18 @@ if ! command -v mvn >/dev/null 2>&1; then
   exit 2
 fi
 
+MAVEN_CMD=("mvn")
+if [[ -n "$MAVEN_SETTINGS_FILE" ]]; then
+  if [[ ! -f "$MAVEN_SETTINGS_FILE" ]]; then
+    echo "[upgrade-precheck] ERROR: MAVEN_SETTINGS_FILE does not exist: $MAVEN_SETTINGS_FILE"
+    exit 2
+  fi
+  MAVEN_CMD+=("-s" "$MAVEN_SETTINGS_FILE")
+  echo "[upgrade-precheck] using maven settings: $MAVEN_SETTINGS_FILE"
+fi
+
 JAVA_VERSION_RAW="$(java -version 2>&1 | head -n 1)"
-MVN_VERSION_RAW="$(mvn -v 2>/dev/null | head -n 1)"
+MVN_VERSION_RAW="$("${MAVEN_CMD[@]}" -v 2>/dev/null | head -n 1)"
 JAVA_VERSION_TOKEN="$(echo "$JAVA_VERSION_RAW" | awk -F'"' '{print $2}')"
 JAVA_MAJOR="$(echo "$JAVA_VERSION_TOKEN" | awk -F. '{if ($1 == "1") print $2; else print $1}')"
 

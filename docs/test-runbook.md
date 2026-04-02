@@ -89,6 +89,28 @@ mvn test
 
 补充：`scripts/test-gate.sh` 在检测到 `status code: 403` 时会输出明确的环境提示，便于快速定位为仓库访问问题而非业务代码失败。
 
+### 4.2 403 场景的可落地解决方案（建议优先做）
+
+如果你希望“后续能真实跑起来验证”，请先完成以下一次性配置：
+
+```bash
+./scripts/create-maven-settings.sh <你的可访问仓库地址> .mvn/settings-mirror.xml
+export MAVEN_SETTINGS_FILE=$PWD/.mvn/settings-mirror.xml
+```
+
+然后用同一套 settings 执行：
+
+```bash
+./scripts/upgrade-precheck.sh --phase jdk17 --strict --report build/upgrade-precheck-report.txt
+./scripts/test-gate.sh smoke
+```
+
+说明：
+
+- `MAVEN_SETTINGS_FILE` 已被 `upgrade-precheck.sh` 与 `test-gate.sh` 支持。
+- `<你的可访问仓库地址>` 建议填写公司 Nexus/Artifactory 的 Maven 代理地址（最稳妥）。
+- 若你已经有 `~/.m2/settings.xml`，也可直接 `export MAVEN_SETTINGS_FILE=~/.m2/settings.xml`。
+
 ## 5. CI 建议
 
 - PR 最低门禁：

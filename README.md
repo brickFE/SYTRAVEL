@@ -67,6 +67,14 @@ mvn test
 
 > 说明：在部分受限网络环境下，可能出现 Maven 访问中央仓库 403（父 POM 无法下载），需要可访问 Maven 仓库的网络或私有镜像仓库。
 
+可选：如果你有公司 Maven 镜像，可先生成 settings 并导出环境变量，再执行测试：
+
+```bash
+./scripts/create-maven-settings.sh <你的可访问仓库地址> .mvn/settings-mirror.xml
+export MAVEN_SETTINGS_FILE=$PWD/.mvn/settings-mirror.xml
+./scripts/test-gate.sh smoke
+```
+
 CI 已配置在 `.github/workflows/ci.yml`，默认执行单元测试、控制器参数校验测试，并在主分支执行全量回归。
 
 推荐使用统一测试入口脚本：

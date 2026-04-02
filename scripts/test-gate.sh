@@ -4,9 +4,20 @@ set -euo pipefail
 MODE="${1:-smoke}"
 TMP_LOG="$(mktemp)"
 trap 'rm -f "${TMP_LOG}"' EXIT
+MAVEN_SETTINGS_FILE="${MAVEN_SETTINGS_FILE:-}"
 
 UNIT_TESTS="PasswordSupportTest,SYLoginServiceTest,SYUserServiceTest,PermissionGuardTest,SYWebsocketServiceTest,GlobalExceptionHandlerTest"
 VALIDATION_TESTS="SYLoginRestValidationTest,SYUserRestValidationTest,SYProjectRestValidationTest,SYTeamRestValidationTest,SYProductRestValidationTest,SYRoleRestValidationTest,SYClassesRestValidationTest,SYLoggerRestValidationTest"
+
+MAVEN_CMD=("mvn")
+if [[ -n "$MAVEN_SETTINGS_FILE" ]]; then
+  if [[ ! -f "$MAVEN_SETTINGS_FILE" ]]; then
+    echo "[test-gate] ERROR: MAVEN_SETTINGS_FILE does not exist: $MAVEN_SETTINGS_FILE" >&2
+    exit 2
+  fi
+  MAVEN_CMD+=("-s" "$MAVEN_SETTINGS_FILE")
+  echo "[test-gate] using maven settings: $MAVEN_SETTINGS_FILE"
+fi
 
 run_mvn() {
   local cmd="$*"
@@ -26,16 +37,16 @@ run_mvn() {
 
 run_unit() {
   echo "[test-gate] unit tests: ${UNIT_TESTS}"
-  run_mvn mvn -q -Dtest="${UNIT_TESTS}" test
+  run_mvn "${MAVEN_CMD[@]}" -q -Dtest="${UNIT_TESTS}" test
 }
 
 run_validation() {
   echo "[test-gate] validation tests: ${VALIDATION_TESTS}"
-  run_mvn mvn -q -Dtest="${VALIDATION_TESTS}" test
+  run_mvn "${MAVEN_CMD[@]}" -q -Dtest="${VALIDATION_TESTS}" test
 }
 
 run_full() {
-  run_mvn mvn test
+  run_mvn "${MAVEN_CMD[@]}" test
 }
 
 case "${MODE}" in
