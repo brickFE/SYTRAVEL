@@ -19,8 +19,11 @@ import com.sy.travel.common.AjaxResult;
 import com.sy.travel.common.Commons;
 import com.sy.travel.common.DateFormat;
 import com.sy.travel.dao.SYClassesRepository;
+import com.sy.travel.dto.classes.ClassesCreateRequest;
+import com.sy.travel.dto.classes.ClassesUpdateRequest;
 import com.sy.travel.entity.Classes;
-import com.sy.travel.entity.Logger;
+import com.sy.travel.service.support.OperationResultSupport;
+import com.sy.travel.service.support.PermissionGuard;
 import com.sy.travel.utils.JSON;
 /**
  * 分类信息的服务层处理
@@ -35,6 +38,8 @@ public class SYClassesService implements DateFormat{
 	private SYClassesRepository syClassesRepository;
 	@Autowired
 	private SYLoggerService syLoggerService;
+	@Autowired
+	private PermissionGuard permissionGuard;
 	
 	/**
 	 * 添加分类信息
@@ -46,6 +51,10 @@ public class SYClassesService implements DateFormat{
 		Date start = new Date();
 		operator = (String) json.get("operator");
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.CLASSES_ADD);
+		}
 		String name = (String) json.get("name");
 		if(StringUtils.isBlank(name)) {
 			reason = Commons.CLASSES_ADD_NAME_NOT_NULL;
@@ -84,6 +93,16 @@ public class SYClassesService implements DateFormat{
 		}
 		return result(operator, start, reason, "1", Commons.CLASSES_ADD);
 	}
+
+	public AjaxResult<String> add(ClassesCreateRequest request) {
+		JSON json = new JSON();
+		json.put("operator", request.getOperator());
+		json.put("name", request.getName());
+		json.put("sortId", request.getSortId());
+		json.put("parentId", request.getParentId());
+		json.put("remark", request.getRemark());
+		return add(json, request.getOperator());
+	}
 	
 	/**
 	 * 删除所选分类信息
@@ -94,6 +113,10 @@ public class SYClassesService implements DateFormat{
 	public AjaxResult<String> delete(int id, String operator) {
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.CLASSES_DELETE);
+		}
 		Classes classes = syClassesRepository.findOne(id);
 		if(classes == null) {
 			reason = Commons.CLASSES_DELETE_DATA_NOT_EXISTS;
@@ -120,6 +143,10 @@ public class SYClassesService implements DateFormat{
 		operator = (String) json.get("operator");
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.CLASSES_UPDATE);
+		}
 		int id = Integer.valueOf((String)json.get("id"));
 		Classes classes = syClassesRepository.findOne(id);
 		String name = (String) json.get("name");
@@ -163,6 +190,17 @@ public class SYClassesService implements DateFormat{
 			return result(operator, start, reason, "0", Commons.CLASSES_ADD);
 		}
 		return result(operator, start, reason, "1", Commons.CLASSES_UPDATE);
+	}
+
+	public AjaxResult<String> update(ClassesUpdateRequest request) {
+		JSON json = new JSON();
+		json.put("operator", request.getOperator());
+		json.put("id", request.getId() == null ? null : String.valueOf(request.getId()));
+		json.put("name", request.getName());
+		json.put("sortId", request.getSortId());
+		json.put("parentId", request.getParentId());
+		json.put("remark", request.getRemark());
+		return update(json, request.getOperator());
 	}
 	
 	/**
@@ -238,10 +276,6 @@ public class SYClassesService implements DateFormat{
 	 * @return
 	 */
 	private AjaxResult<String> result(String operator, Date start, String reason, String status, String operation) {
-		Logger logger = new Logger(operator, sdf.format(start), sdf.format(new Date()),
-				StringUtils.isBlank(reason) ? operator + operation + ":成功" : operator + operation + "失败原因:" + reason,
-				status, operation);// 记录操作日志
-		syLoggerService.save(logger);
-		return new AjaxResult<String>(200, "1".equals(status) ? "success" : "failed", reason);
+		return OperationResultSupport.build(syLoggerService, operator, start, reason, status, operation);
 	}
 }

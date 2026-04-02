@@ -3,10 +3,13 @@ package com.sy.travel.rest;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,8 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sy.travel.common.AjaxResult;
+import com.sy.travel.dto.team.TeamCreateRequest;
+import com.sy.travel.dto.team.TeamUpdateRequest;
 import com.sy.travel.service.SYTeamService;
-import com.sy.travel.utils.JSON;
 
 /**
  * 团队管理接口： 查看所有团队信息、
@@ -24,6 +28,7 @@ import com.sy.travel.utils.JSON;
  *
  */
 @RestController
+@Validated
 @RequestMapping(value = "/sy/team", produces = MediaType.APPLICATION_JSON_VALUE)
 public class SYTeamRest {
 	@Autowired
@@ -37,9 +42,9 @@ public class SYTeamRest {
 	@RequestMapping(value = "/all", method = RequestMethod.GET)
 	public AjaxResult<Map<String, Object>> findAll(
 			@RequestParam(defaultValue = "") String name,
-			@RequestParam(defaultValue = "1") int currentPage,
-			@RequestParam(defaultValue = "5") int pageSize) {
-		return new AjaxResult<Map<String, Object>>(200, "success", syTeamService.findAll(name,currentPage,pageSize));
+			@RequestParam(defaultValue = "1") @Min(1) int currentPage,
+			@RequestParam(defaultValue = "5") @Min(1) int pageSize) {
+		return AjaxResult.success(syTeamService.findAll(name,currentPage,pageSize));
 	}
 
 	/**
@@ -50,8 +55,8 @@ public class SYTeamRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/add", method = RequestMethod.POST, consumes = "application/json")
-	public AjaxResult<String> add(@RequestBody JSON json, HttpServletRequest request) {
-		return syTeamService.add(json, request.getRemoteUser());
+	public AjaxResult<String> add(@Valid @RequestBody TeamCreateRequest request) {
+		return syTeamService.add(request);
 	}
 
 	/**
@@ -60,7 +65,7 @@ public class SYTeamRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/info", method = RequestMethod.GET)
-	public AjaxResult<List<Map<String, Object>>> info(@RequestParam("id") int id){
+	public AjaxResult<List<Map<String, Object>>> info(@RequestParam("id") @Min(1) int id){
 		return syTeamService.info(id);
 	}
 	
@@ -71,9 +76,9 @@ public class SYTeamRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/allbypid", method = RequestMethod.GET)
-	public AjaxResult<Map<String, Object>> findAllByProjectId(@RequestParam(defaultValue = "") String projectId) {
+	public AjaxResult<Map<String, Object>> findAllByProjectId(@RequestParam("projectId") @NotBlank String projectId) {
 		Map<String, Object> data = syTeamService.queryByProjectId(projectId);
-		return new AjaxResult<Map<String, Object>>(200, "success", data);
+		return AjaxResult.success(data);
 	}
 
 	/**
@@ -85,7 +90,7 @@ public class SYTeamRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
-	public AjaxResult<String> deleteByTeamId(@RequestParam("id") Integer id, @RequestParam("operator") String operator, HttpServletRequest request) {
+	public AjaxResult<String> deleteByTeamId(@RequestParam("id") @Min(1) Integer id, @RequestParam("operator") @NotBlank String operator) {
 		return syTeamService.deleteByTeamId(id, operator);
 	}
 	/**
@@ -95,7 +100,7 @@ public class SYTeamRest {
 	 * @return
 	 */
 	@RequestMapping(value="/update", method = RequestMethod.POST, consumes = "application/json")
-	public AjaxResult<String> update(@RequestBody JSON json, HttpServletRequest request) {
-		return syTeamService.update(json, request.getRemoteUser());
+	public AjaxResult<String> update(@Valid @RequestBody TeamUpdateRequest request) {
+		return syTeamService.update(request);
 	}
 }

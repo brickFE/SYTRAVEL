@@ -1,7 +1,6 @@
 package com.sy.travel.service;
 
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -19,10 +18,14 @@ import org.springframework.stereotype.Service;
 import com.sy.travel.common.AjaxResult;
 import com.sy.travel.common.Commons;
 import com.sy.travel.common.DateFormat;
+import com.sy.travel.common.PasswordSupport;
 import com.sy.travel.dao.SYUserRepository;
-import com.sy.travel.entity.Logger;
+import com.sy.travel.dto.user.UserAdminPwdUpdateRequest;
+import com.sy.travel.dto.user.UserCreateRequest;
+import com.sy.travel.dto.user.UserUpdateRequest;
 import com.sy.travel.entity.User;
-import com.sy.travel.utils.JSON;
+import com.sy.travel.service.support.OperationResultSupport;
+import com.sy.travel.service.support.PermissionGuard;
 
 
 /**
@@ -36,22 +39,23 @@ public class SYUserService implements DateFormat{
 	private SYUserRepository syUserRepository;
 	@Autowired
 	private SYLoggerService syLoggerService;
-	private String setPassword(String username, String password) {
-		String pwd = username + ":" + password;
-		byte[] encode = Base64.getEncoder().encode(pwd.getBytes());
-		return new String(encode);
-	}
+	@Autowired
+	private PermissionGuard permissionGuard;
 	/**
 	 * 添加用户信息
 	 * @param json
 	 * @param operator
 	 * @return
 	 */
-	public AjaxResult<String> add(JSON json, String operator){
-		operator = (String) json.get("operator");
+	public AjaxResult<String> add(UserCreateRequest request){
+		String operator = request.getOperator();
 		Date start = new Date();
 		String reason = "";
-		String username = (String) json.get("username");
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.USER_ADD);
+		}
+		String username = request.getUsername();
 		if(StringUtils.isBlank(username)) {
 			reason = Commons.USER_ADD_USRENAME_NOT_NULL;
 			return result(operator, start, reason, "0", Commons.USER_ADD);
@@ -61,19 +65,19 @@ public class SYUserService implements DateFormat{
 			reason = Commons.USER_ADD_USRENAME_IS_EXISTS;
 			return result(operator, start, reason, "0", Commons.USER_ADD);
 		}
-		String password = (String) json.get("password");
+		String password = request.getPassword();
 		if(StringUtils.isBlank(password)) {
 			reason = Commons.USER_ADD_PASSWORD_NOT_NULL;
 			return result(operator, start, reason, "0", Commons.USER_ADD);
 		}
-		String permissionStr = (String) json.get("permission");
+		String permissionStr = request.getPermission();
 		if(StringUtils.isBlank(permissionStr)) {
 			reason = Commons.USER_ADD_PERMISSION_NOT_NULL;
 			return result(operator, start, reason, "0", Commons.USER_ADD);
 		}
-		String remark = (String) json.get("remark");
+		String remark = request.getRemark();
 		remark = StringUtils.isBlank(remark)? "" : remark;
-		User user = new User(username, setPassword(username, password), remark, permissionStr);
+		User user = new User(username, PasswordSupport.hash(password), remark, permissionStr);
 		User resl = syUserRepository.save(user);
 		if(resl == null) {
 			reason = Commons.USER_ADD_SAVE_FAILED;
@@ -90,6 +94,10 @@ public class SYUserService implements DateFormat{
 	public AjaxResult<String> delete(int id, String operator){
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.USER_DELETE);
+		}
 		try {
 			syUserRepository.delete(id);
 			return result(operator, start, reason, "1", Commons.USER_DELETE);
@@ -107,9 +115,9 @@ public class SYUserService implements DateFormat{
 	public AjaxResult<String> getPermission(String username){
 		User user = syUserRepository.findByUsername(username);
 		if(user == null) {
-			return new AjaxResult<String>(400, "failed", "用户未登录");
+			return AjaxResult.failed(400, Commons.USER_NOT_LOGIN);
 		} else {
-			return new AjaxResult<String>(200, "success", user.getPermission());
+			return AjaxResult.success(user.getPermission());
 		}
 	}
 	
@@ -119,34 +127,40 @@ public class SYUserService implements DateFormat{
 	 * @param operator
 	 * @return
 	 */
-	public AjaxResult<String> update(JSON json, String operator){
-		operator = (String) json.get("operator");
+	public AjaxResult<String> update(UserUpdateRequest request){
+		String operator = request.getOperator();
 		Date start = new Date();
 		String reason = "";
-		String id = (String) json.get("id");
-		if(StringUtils.isBlank(id)) {
-			reason = Commons.USER_UPDATE_NOT_FOUNT;
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
 			return result(operator, start, reason, "0", Commons.USER_UPDATE);
 		}
-		User uTemp = syUserRepository.findOne(Integer.valueOf(id));
+		Integer id = request.getId();
+		if(id == null) {
+			reason = Commons.USER_UPDATE_NOT_FOUND;
+			return result(operator, start, reason, "0", Commons.USER_UPDATE);
+		}
+		User uTemp = syUserRepository.findOne(id);
 		if(uTemp == null) {
-			reason = Commons.USER_UPDATE_NOT_FOUNT;
+			reason = Commons.USER_UPDATE_NOT_FOUND;
 			return result(operator, start, reason, "0", Commons.USER_UPDATE);
 		}
-		String password = (String) json.get("password");
+		String password = request.getPassword();
 		if(StringUtils.isBlank(password)) {
-			password = uTemp.getPassword();
+			password = uTemp.getEncodedPassword();
+		} else {
+			password = PasswordSupport.hash(password);
 		} 
-		String permissionStr = (String) json.get("permission");
+		String permissionStr = request.getPermission();
 		if(StringUtils.isBlank(permissionStr)) {
 			permissionStr = uTemp.getPermission();
 		}
-		String remark = (String) json.get("remark");
+		String remark = request.getRemark();
 		if(StringUtils.isBlank(remark)) {
 			remark = uTemp.getRemark();
 		}
-		User user = new User(uTemp.getUsername(), setPassword(uTemp.getUsername(), password), remark, permissionStr);
-		user.setId(Integer.valueOf(id));
+		User user = new User(uTemp.getUsername(), password, remark, permissionStr);
+		user.setId(id);
 		User resl = syUserRepository.save(user);
 		if(resl == null) {
 			reason = Commons.USER_ADD_SAVE_FAILED;
@@ -161,41 +175,41 @@ public class SYUserService implements DateFormat{
 	 * @param operator
 	 * @return
 	 */
-	public AjaxResult<String> updateAdminPwd(JSON json, String operator){
-		operator = (String) json.get("operator");
+	public AjaxResult<String> updateAdminPwd(UserAdminPwdUpdateRequest request){
+		String operator = request.getOperator();
 		Date start = new Date();
 		String reason = "";
-		if(!"admin".equals(operator)) {
-			reason = Commons.USER_UPDATE_PWD_NOT_PERMISSION;
-			return result(operator, start, reason, "0", Commons.USER_UPDTE_PWD);
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.USER_UPDATE_PWD);
 		}
 		User uTemp = syUserRepository.findByUsername("admin");
 		if(uTemp == null) {
-			reason = Commons.USER_UPDATE_NOT_FOUNT;
-			return result(operator, start, reason, "0", Commons.USER_UPDTE_PWD);
+			reason = Commons.USER_UPDATE_NOT_FOUND;
+			return result(operator, start, reason, "0", Commons.USER_UPDATE_PWD);
 		}
-		String password = (String) json.get("password");
+		String password = request.getPassword();
 		if(StringUtils.isBlank(password)) {
-			reason = "超级管理员原密码不能为空";
-			return result(operator, start, reason, "0", Commons.USER_UPDTE_PWD);
+			reason = Commons.USER_ADMIN_OLD_PASSWORD_EMPTY;
+			return result(operator, start, reason, "0", Commons.USER_UPDATE_PWD);
 		} 
-		if(!password.equals(uTemp.getPassword())) {
-			reason = "超级管理员原密码输入错误";
-			return result(operator, start, reason, "0", Commons.USER_UPDTE_PWD);
+		if(!PasswordSupport.matches(uTemp.getUsername(), password, uTemp.getEncodedPassword())) {
+			reason = Commons.USER_ADMIN_OLD_PASSWORD_ERROR;
+			return result(operator, start, reason, "0", Commons.USER_UPDATE_PWD);
 		}
-		String newPwd = (String) json.get("newPwd");
+		String newPwd = request.getNewPwd();
 		if(StringUtils.isBlank(newPwd)) {
-			reason = "超级管理员新密码不能为空";
-			return result(operator, start, reason, "0", Commons.USER_UPDTE_PWD);
+			reason = Commons.USER_ADMIN_NEW_PASSWORD_EMPTY;
+			return result(operator, start, reason, "0", Commons.USER_UPDATE_PWD);
 		} 
-		User user = new User(uTemp.getUsername(), setPassword(uTemp.getUsername(), newPwd), uTemp.getRemark(), uTemp.getPermission());
+		User user = new User(uTemp.getUsername(), PasswordSupport.hash(newPwd), uTemp.getRemark(), uTemp.getPermission());
 		user.setId(uTemp.getId());
 		User resl = syUserRepository.save(user);
 		if(resl == null) {
 			reason = Commons.USER_ADD_SAVE_FAILED;
-			return result(operator, start, reason, "0", Commons.USER_UPDTE_PWD);
+			return result(operator, start, reason, "0", Commons.USER_UPDATE_PWD);
 		}
-		return result(operator, start, reason, "1", Commons.USER_UPDTE_PWD);
+		return result(operator, start, reason, "1", Commons.USER_UPDATE_PWD);
 	}
 	
 
@@ -254,10 +268,6 @@ public class SYUserService implements DateFormat{
 	 * @return
 	 */
 	private AjaxResult<String> result(String operator, Date start, String reason, String status, String operation) {
-		Logger logger = new Logger(operator, sdf.format(start), sdf.format(new Date()),
-				StringUtils.isBlank(reason) ? operator + operation + ":成功" : operator + operation + "失败原因:" + reason,
-				status, operation);// 记录操作日志
-		syLoggerService.save(logger);
-		return new AjaxResult<String>(200, "1".equals(status) ? "success" : "failed", reason);
+		return OperationResultSupport.build(syLoggerService, operator, start, reason, status, operation);
 	}
 }

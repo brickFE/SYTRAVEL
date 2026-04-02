@@ -19,8 +19,11 @@ import com.sy.travel.common.AjaxResult;
 import com.sy.travel.common.Commons;
 import com.sy.travel.common.DateFormat;
 import com.sy.travel.dao.SYProjectRepository;
-import com.sy.travel.entity.Logger;
+import com.sy.travel.dto.project.ProjectCreateRequest;
+import com.sy.travel.dto.project.ProjectUpdateRequest;
 import com.sy.travel.entity.Project;
+import com.sy.travel.service.support.OperationResultSupport;
+import com.sy.travel.service.support.PermissionGuard;
 import com.sy.travel.utils.JSON;
 
 
@@ -40,6 +43,8 @@ public class SYProjectService implements DateFormat{
 	private SYProductService syProductService;
 	@Autowired
 	private SYLoggerService syLoggerService;
+	@Autowired
+	private PermissionGuard permissionGuard;
 
 	/**
 	 * 添加项目信息
@@ -54,6 +59,10 @@ public class SYProjectService implements DateFormat{
 		operator = (String) json.get("operator");// 操作人
 		Date start = new Date();// 添加操作开始时间
 		String reason = "";// 记录操作过程中的操作结果
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.PROJECT_ADD);
+		}
 		String code = (String) json.get("code");
 		if (StringUtils.isBlank(code)) {
 			reason = Commons.PROJECT_ADD_CODE_NOT_NULL;
@@ -130,6 +139,18 @@ public class SYProjectService implements DateFormat{
 		return result(operator, start, reason, "1", Commons.PROJECT_ADD);
 	}
 
+	public AjaxResult<String> add(ProjectCreateRequest request) {
+		JSON json = new JSON();
+		json.put("operator", request.getOperator());
+		json.put("code", request.getCode());
+		json.put("name", request.getName());
+		json.put("beginDate", request.getBeginDate());
+		json.put("endDate", request.getEndDate());
+		json.put("valid", request.getValid());
+		json.put("remark", request.getRemark());
+		return add(json, request.getOperator());
+	}
+
 	/**
 	 * 根据id删除这个项目及项目下的所有团队和产品信息
 	 * 
@@ -140,6 +161,10 @@ public class SYProjectService implements DateFormat{
 	public AjaxResult<String> deleteById(int id, String operator) {
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.PROJECT_DELETE);
+		}
 		try {
 			// 根据项目id查询这个项目下的团队信息
 			Map<String, Object> teamMap = syTeamService.queryByProjectId(String.valueOf(id));
@@ -172,6 +197,10 @@ public class SYProjectService implements DateFormat{
 		operator = (String) json.get("operator");
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.PROJECT_UPDATE);
+		}
 		if (StringUtils.isBlank((String) json.get("id"))) {
 			reason = Commons.PROJECT_UPDATE_ID_NOT_NULL;
 			return result(operator, start, reason, "0", Commons.PROJECT_UPDATE);
@@ -283,6 +312,19 @@ public class SYProjectService implements DateFormat{
 		return result(operator, start, reason, "1", Commons.PROJECT_UPDATE);
 	}
 
+	public AjaxResult<String> update(ProjectUpdateRequest request) {
+		JSON json = new JSON();
+		json.put("operator", request.getOperator());
+		json.put("id", request.getId() == null ? null : String.valueOf(request.getId()));
+		json.put("code", request.getCode());
+		json.put("name", request.getName());
+		json.put("beginDate", request.getBeginDate());
+		json.put("endDate", request.getEndDate());
+		json.put("valid", request.getValid());
+		json.put("remark", request.getRemark());
+		return update(json, request.getOperator());
+	}
+
 	/**
 	 * 查看所有项目的信息 根据项目名称查询这个项目的信息 当项目名称为空时，返回的是所有项目的信息
 	 * 
@@ -380,10 +422,6 @@ public class SYProjectService implements DateFormat{
 	 * @return
 	 */
 	private AjaxResult<String> result(String operator, Date start, String reason, String status, String operation) {
-		Logger logger = new Logger(operator, sdf.format(start), sdf.format(new Date()),
-				StringUtils.isBlank(reason) ? operator + operation + ":成功" : operator + operation + "失败原因:" + reason,
-				status, operation);// 记录操作日志
-		syLoggerService.save(logger);
-		return new AjaxResult<String>(200, "1".equals(status) ? "success" : "failed", reason);
+		return OperationResultSupport.build(syLoggerService, operator, start, reason, status, operation);
 	}
 }

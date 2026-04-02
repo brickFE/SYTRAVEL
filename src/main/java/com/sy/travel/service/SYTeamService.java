@@ -22,11 +22,14 @@ import com.sy.travel.dao.SYProductRepository;
 import com.sy.travel.dao.SYProjectRepository;
 import com.sy.travel.dao.SYRoleRepository;
 import com.sy.travel.dao.SYTeamRepository;
-import com.sy.travel.entity.Logger;
+import com.sy.travel.dto.team.TeamCreateRequest;
+import com.sy.travel.dto.team.TeamUpdateRequest;
 import com.sy.travel.entity.Product;
 import com.sy.travel.entity.Project;
 import com.sy.travel.entity.Role;
 import com.sy.travel.entity.Team;
+import com.sy.travel.service.support.OperationResultSupport;
+import com.sy.travel.service.support.PermissionGuard;
 import com.sy.travel.utils.JSON;
 
 /**
@@ -49,6 +52,8 @@ public class SYTeamService implements DateFormat{
 	private SYLoggerService syLoggerService;
 	@Autowired
 	private SYRoleRepository syRoleRepository;
+	@Autowired
+	private PermissionGuard permissionGuard;
 
 	/**
 	 * 查询所有团队信息的逻辑操作
@@ -123,8 +128,12 @@ public class SYTeamService implements DateFormat{
 	public AjaxResult<String> add(JSON json, String operator) {
 		operator = (String) json.get("operator");
 		Date start = new Date();
-		String name = (String) json.get("name");
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.TEAM_ADD);
+		}
+		String name = (String) json.get("name");
 		if (StringUtils.isBlank(name)) {
 			reason = Commons.TEAM_ADD_NAME_NOT_NULL;
 			return result(operator, start, reason, "0", Commons.TEAM_ADD);
@@ -167,6 +176,16 @@ public class SYTeamService implements DateFormat{
 		return result(operator, start, reason, "1", Commons.TEAM_ADD);
 	}
 
+	public AjaxResult<String> add(TeamCreateRequest request) {
+		JSON json = new JSON();
+		json.put("operator", request.getOperator());
+		json.put("name", request.getName());
+		json.put("projectId", request.getProjectId());
+		json.put("valid", request.getValid());
+		json.put("remark", request.getRemark());
+		return add(json, request.getOperator());
+	}
+
 	public Map<String, Object> queryByProjectId(String projectId) {
 		Map<String, Object> resultMap = new HashMap<>();
 		if (StringUtils.isBlank(projectId)) {
@@ -203,6 +222,10 @@ public class SYTeamService implements DateFormat{
 	public AjaxResult<String> deleteByTeamId(Integer id, String operator) {
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.TEAM_DELETE);
+		}
 		try {
 			teamRepository.delete(id);
 			//删除这个团队下的产品信息
@@ -255,6 +278,10 @@ public class SYTeamService implements DateFormat{
 		operator = (String) json.get("operator");
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.TEAM_UPDATE);
+		}
 		if (StringUtils.isBlank((String) json.get("id"))) {
 			reason = Commons.PROJECT_UPDATE_ID_NOT_NULL;
 			return result(operator, start, reason, "0", Commons.TEAM_UPDATE);
@@ -309,6 +336,17 @@ public class SYTeamService implements DateFormat{
 		}
 		return result(operator, start, reason, "1", Commons.TEAM_UPDATE);
 	}
+
+	public AjaxResult<String> update(TeamUpdateRequest request) {
+		JSON json = new JSON();
+		json.put("operator", request.getOperator());
+		json.put("id", request.getId() == null ? null : String.valueOf(request.getId()));
+		json.put("name", request.getName());
+		json.put("projectId", request.getProjectId());
+		json.put("valid", request.getValid());
+		json.put("remark", request.getRemark());
+		return update(json, request.getOperator());
+	}
 	
 	/**
 	 * 根据团队id查看这个团队下所有的产品信息
@@ -320,10 +358,10 @@ public class SYTeamService implements DateFormat{
 		Map<String, Object> temp = syProductService.findByTeamId(String.valueOf(id));
 		int totalP = (int) temp.get("total");
 		if (totalP == 0) {
-			return new AjaxResult<List<Map<String,Object>>>(200, "success", new ArrayList<>());
+			return AjaxResult.success(new ArrayList<>());
 		}
 		List<Map<String, Object>> list = (List<Map<String, Object>>) temp.get("documents");
-		return new AjaxResult<List<Map<String,Object>>>(200, "success", list);
+		return AjaxResult.success(list);
 	}
 
 	/**
@@ -342,10 +380,6 @@ public class SYTeamService implements DateFormat{
 	 * @return
 	 */
 	private AjaxResult<String> result(String operator, Date start, String reason, String status, String operation) {
-		Logger logger = new Logger(operator, sdf.format(start), sdf.format(new Date()),
-				StringUtils.isBlank(reason) ? operator + operation + ":成功" : operator + operation + "失败原因:" + reason,
-				status, operation);// 记录操作日志
-		syLoggerService.save(logger);
-		return new AjaxResult<String>(200, "1".equals(status) ? "success" : "failed", reason);
+		return OperationResultSupport.build(syLoggerService, operator, start, reason, status, operation);
 	}
 }

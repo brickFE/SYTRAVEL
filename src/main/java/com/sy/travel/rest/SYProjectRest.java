@@ -2,10 +2,13 @@ package com.sy.travel.rest;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,8 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sy.travel.common.AjaxResult;
+import com.sy.travel.dto.project.ProjectCreateRequest;
+import com.sy.travel.dto.project.ProjectUpdateRequest;
 import com.sy.travel.service.SYProjectService;
-import com.sy.travel.utils.JSON;
 
 /**
  * 项目模块的接口
@@ -23,6 +27,7 @@ import com.sy.travel.utils.JSON;
  *
  */
 @RestController
+@Validated
 @RequestMapping(value = "/sy/project", produces = MediaType.APPLICATION_JSON_VALUE)
 public class SYProjectRest {
 	@Autowired
@@ -39,11 +44,11 @@ public class SYProjectRest {
 	@RequestMapping(value = "/all", method = RequestMethod.GET)
 	public AjaxResult<Map<String, Object>> all(
 			@RequestParam(defaultValue = "") String name,
-			@RequestParam(defaultValue = "1") int currentPage,
-			@RequestParam(defaultValue = "10") int pageSize
+			@RequestParam(defaultValue = "1") @Min(1) int currentPage,
+			@RequestParam(defaultValue = "10") @Min(1) int pageSize
 			) {
 		Map<String, Object> data = syProjectService.queryAll(name, currentPage, pageSize);
-		return new AjaxResult<Map<String, Object>>(200, "success", data);
+		return AjaxResult.success(data);
 	}
 
 	/**
@@ -52,8 +57,8 @@ public class SYProjectRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/info", method = RequestMethod.GET)
-	public AjaxResult<Map<String, Object>> info(@RequestParam(defaultValue = "0") Integer id) {
-		return new AjaxResult<Map<String, Object>>(200, "success", syProjectService.info(id));
+	public AjaxResult<Map<String, Object>> info(@RequestParam(defaultValue = "1") @Min(1) Integer id) {
+		return AjaxResult.success(syProjectService.info(id));
 	}
 	/**
 	 * 添加项目信息的接口
@@ -62,8 +67,8 @@ public class SYProjectRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/add", method = RequestMethod.POST, consumes = "application/json")
-	public AjaxResult<String> add(@RequestBody JSON json, HttpServletRequest request) {
-		return syProjectService.add(json, request.getRemoteUser());
+	public AjaxResult<String> add(@Valid @RequestBody ProjectCreateRequest request) {
+		return syProjectService.add(request);
 	}
 	
 	/**
@@ -72,7 +77,7 @@ public class SYProjectRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
-	public AjaxResult<String> delete(@RequestParam("id") Integer id, @RequestParam("operator") String operator, HttpServletRequest request){
+	public AjaxResult<String> delete(@RequestParam("id") @Min(1) Integer id, @RequestParam("operator") @NotBlank String operator){
 		return syProjectService.deleteById(id, operator);
 	}
 	
@@ -83,7 +88,7 @@ public class SYProjectRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json")
-	public AjaxResult<String> update(@RequestBody JSON json, HttpServletRequest request){
-		return syProjectService.update(json, request.getRemoteUser());
+	public AjaxResult<String> update(@Valid @RequestBody ProjectUpdateRequest request){
+		return syProjectService.update(request);
 	}
 }
