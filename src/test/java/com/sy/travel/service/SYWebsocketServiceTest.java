@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import javax.websocket.Session;
+import jakarta.websocket.Session;
 
 import com.sy.travel.common.AjaxResult;
 

@@ -25,7 +25,7 @@ top_hotspots="$(
     | sort \
     | uniq -c \
     | sort -nr \
-    | head -n 20
+    | head -n 20 || true
 )"
 
 {

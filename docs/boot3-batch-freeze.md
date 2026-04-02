@@ -41,6 +41,6 @@
 
 ## 5) 当前进度状态（滚动）
 
-- Batch A：进行中（已完成 `dto/rest/handler` 的 `javax.validation.*` -> `jakarta.validation.*` import 切换）
-- Batch B：进行中（已完成 `entity` 的 `javax.persistence.*` -> `jakarta.persistence.*` import 切换）
-- Batch C：未开始
+- Batch A：已完成（`dto/rest/handler` 的 `javax.validation.*` -> `jakarta.validation.*` import 切换）
+- Batch B：已完成（`entity` 的 `javax.persistence.*` -> `jakarta.persistence.*` import 切换）
+- Batch C：已完成（`websocket` 的 `javax.websocket.*` -> `jakarta.websocket.*` import 切换）
