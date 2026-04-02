@@ -36,7 +36,26 @@ case "$BATCH" in
     ;;
 esac
 
-changed_files="$(git diff --name-only "$BASE_REF" "$TARGET_REF" -- src/main/java || true)"
+valid_base_ref=1
+valid_target_ref=1
+
+if ! git rev-parse --verify --quiet "$BASE_REF^{commit}" >/dev/null; then
+  valid_base_ref=0
+fi
+
+if ! git rev-parse --verify --quiet "$TARGET_REF^{commit}" >/dev/null; then
+  valid_target_ref=0
+fi
+
+if [[ "$valid_base_ref" -eq 0 || "$valid_target_ref" -eq 0 ]]; then
+  echo "[freeze-guard] WARN: Unable to resolve revision(s)." >&2
+  [[ "$valid_base_ref" -eq 0 ]] && echo "[freeze-guard]  - invalid base_ref: $BASE_REF" >&2
+  [[ "$valid_target_ref" -eq 0 ]] && echo "[freeze-guard]  - invalid target_ref: $TARGET_REF" >&2
+  echo "[freeze-guard] Fallback: evaluating only local working tree Java changes." >&2
+  changed_files="$(git status --porcelain -- src/main/java | awk '{print $2}' || true)"
+else
+  changed_files="$(git diff --name-only "$BASE_REF" "$TARGET_REF" -- src/main/java || true)"
+fi
 
 if [[ -z "$changed_files" ]]; then
   echo "[freeze-guard] No Java source changes detected in range $BASE_REF..$TARGET_REF"
