@@ -84,6 +84,20 @@ UNMAPPED_COUNT=0
   echo "- javax import occurrences: \`${JAVAX_COUNT:-unknown}\`"
   echo "- javax category breakdown: servlet=\`${JAVAX_SERVLET_COUNT:-0}\`, validation=\`${JAVAX_VALIDATION_COUNT:-0}\`, persistence=\`${JAVAX_PERSISTENCE_COUNT:-0}\`, websocket=\`${JAVAX_WEBSOCKET_COUNT:-0}\`, annotation=\`${JAVAX_ANNOTATION_COUNT:-0}\`, other=\`${JAVAX_OTHER_COUNT:-0}\`"
   echo
+  echo "## Phase 0 - Recommended Migration Batches"
+  if [[ "${JAVAX_VALIDATION_COUNT:-0}" -gt 0 || "${JAVAX_ANNOTATION_COUNT:-0}" -gt 0 ]]; then
+    echo "- [ ] Batch A (High ROI): validation + annotation migration (\`javax.validation.*\` / \`javax.annotation.*\`) [owner: backend-api]"
+  fi
+  if [[ "${JAVAX_PERSISTENCE_COUNT:-0}" -gt 0 ]]; then
+    echo "- [ ] Batch B (Data Layer): persistence migration (\`javax.persistence.*\`) [owner: backend-core]"
+  fi
+  if [[ "${JAVAX_SERVLET_COUNT:-0}" -gt 0 || "${JAVAX_WEBSOCKET_COUNT:-0}" -gt 0 ]]; then
+    echo "- [ ] Batch C (Protocol Layer): servlet/websocket migration (\`javax.servlet.*\` / \`javax.websocket.*\`) [owner: backend-platform]"
+  fi
+  if [[ "${JAVAX_OTHER_COUNT:-0}" -gt 0 ]]; then
+    echo "- [ ] Batch D (Misc): remaining \`javax.*\` imports [owner: backend-core]"
+  fi
+  echo
   echo "## Phase 1 - Baseline Lock"
   echo "- [ ] Ensure CI strict precheck is green on PR branch"
   echo "- [ ] Confirm Java 8 baseline before first migration hop"

@@ -132,3 +132,4 @@ CI 严格模式（用于门禁失败）：
 - 基于报告自动生成 `upgrade-execution-checklist` artifact（用于升级分工执行）
   - 清单包含热点风险等级和 owner 信息（默认来自 `config/upgrade-owners.map`）
   - CI 使用 `--fail-on-unmapped`，若热点未命中 owner 映射将直接失败
+  - 清单会基于 `javax` 分类计数自动给出迁移批次建议（Batch A/B/C/D）
