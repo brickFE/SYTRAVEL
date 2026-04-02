@@ -38,3 +38,9 @@
 1. 本文档冻结后，新增/变更文件只能进入对应批次，不跨批插入。  
 2. 若发现跨批强依赖，必须在 PR 说明中给出原因与回滚策略。  
 3. 每个批次结束时更新一次“完成状态”与“剩余风险”。
+
+## 5) 当前进度状态（滚动）
+
+- Batch A：进行中（已完成 `dto/rest/handler` 的 `javax.validation.*` -> `jakarta.validation.*` import 切换）
+- Batch B：未开始
+- Batch C：未开始

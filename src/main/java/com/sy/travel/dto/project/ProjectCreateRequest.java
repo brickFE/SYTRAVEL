@@ -1,6 +1,6 @@
 package com.sy.travel.dto.project;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public class ProjectCreateRequest {
 	@NotBlank(message = "operator不能为空")

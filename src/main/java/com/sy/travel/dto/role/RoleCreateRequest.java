@@ -1,7 +1,7 @@
 package com.sy.travel.dto.role;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 public class RoleCreateRequest {
 	@NotBlank(message = "operator不能为空")

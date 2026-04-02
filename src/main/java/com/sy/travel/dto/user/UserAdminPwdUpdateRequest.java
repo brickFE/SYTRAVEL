@@ -1,6 +1,6 @@
 package com.sy.travel.dto.user;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public class UserAdminPwdUpdateRequest {
 	@NotBlank(message = "operator不能为空")

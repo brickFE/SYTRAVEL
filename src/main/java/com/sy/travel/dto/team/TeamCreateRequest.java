@@ -1,6 +1,6 @@
 package com.sy.travel.dto.team;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public class TeamCreateRequest {
 	@NotBlank(message = "operator不能为空")

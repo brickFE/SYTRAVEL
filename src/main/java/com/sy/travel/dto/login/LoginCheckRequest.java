@@ -1,6 +1,6 @@
 package com.sy.travel.dto.login;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public class LoginCheckRequest {
 	@NotBlank(message = "username不能为空")

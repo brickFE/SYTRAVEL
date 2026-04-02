@@ -2,7 +2,7 @@ package com.sy.travel.rest;
 
 import java.util.Map;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
