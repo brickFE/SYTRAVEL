@@ -23,7 +23,14 @@ jobs:
           cache: maven
 
       - name: Upgrade readiness precheck
-        run: ./scripts/upgrade-precheck.sh --strict
+        run: ./scripts/upgrade-precheck.sh --strict --report build/upgrade-precheck-report.txt
+
+      - name: Upload upgrade precheck report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: upgrade-precheck-report
+          path: build/upgrade-precheck-report.txt
 
   unit-and-validation-tests:
     needs: upgrade-readiness-precheck

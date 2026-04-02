@@ -111,6 +111,12 @@ CI 严格模式（用于门禁失败）：
 ./scripts/upgrade-precheck.sh --strict
 ```
 
+输出报告文件（便于 CI 归档）：
+
+```bash
+./scripts/upgrade-precheck.sh --strict --report build/upgrade-precheck-report.txt
+```
+
 该脚本会输出：
 
 - 本地 Java / Maven 版本

@@ -5,9 +5,27 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 STRICT_MODE=0
-if [[ "${1:-}" == "--strict" ]]; then
-  STRICT_MODE=1
-fi
+REPORT_FILE=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --strict)
+      STRICT_MODE=1
+      shift
+      ;;
+    --report)
+      REPORT_FILE="${2:-}"
+      if [[ -z "$REPORT_FILE" ]]; then
+        echo "[upgrade-precheck] ERROR: --report requires a file path"
+        exit 2
+      fi
+      shift 2
+      ;;
+    *)
+      echo "[upgrade-precheck] ERROR: unknown argument: $1"
+      exit 2
+      ;;
+  esac
+done
 
 echo "[upgrade-precheck] project: $ROOT_DIR"
 
@@ -54,8 +72,8 @@ if [[ "${BOOT_PARENT_VERSION:-}" != "1.5.9.RELEASE" ]]; then
   echo "[upgrade-precheck] WARN: expected current parent spring-boot-starter-parent=1.5.9.RELEASE"
 fi
 
+STRICT_FAILED=0
 if [[ "$STRICT_MODE" -eq 1 ]]; then
-  STRICT_FAILED=0
   if [[ "${JAVA_MAJOR:-}" != "8" ]]; then
     echo "[upgrade-precheck] STRICT-ERROR: expected runtime Java major version 8, got ${JAVA_MAJOR:-unknown}"
     STRICT_FAILED=1
@@ -68,14 +86,30 @@ if [[ "$STRICT_MODE" -eq 1 ]]; then
     echo "[upgrade-precheck] STRICT-ERROR: expected spring-boot-starter-parent=1.5.9.RELEASE"
     STRICT_FAILED=1
   fi
-  if [[ "$STRICT_FAILED" -eq 1 ]]; then
-    echo "[upgrade-precheck] strict check failed"
-    exit 1
-  fi
 fi
 
 echo "[upgrade-precheck] scanning javax.* imports (for Boot 3 migration impact sizing)..."
 JAVA_FILES_WITH_JAVAX="$(rg -n "import javax\\." src/main/java src/test/java | wc -l | tr -d ' ')"
 echo "[upgrade-precheck] javax import occurrences: $JAVA_FILES_WITH_JAVAX"
+
+if [[ -n "$REPORT_FILE" ]]; then
+  mkdir -p "$(dirname "$REPORT_FILE")"
+  {
+    echo "upgrade_precheck_strict_mode=$STRICT_MODE"
+    echo "upgrade_precheck_strict_failed=$STRICT_FAILED"
+    echo "java_version_raw=$JAVA_VERSION_RAW"
+    echo "java_major=$JAVA_MAJOR"
+    echo "maven_version_raw=$MVN_VERSION_RAW"
+    echo "pom_java_version=${POM_JAVA_VERSION:-unknown}"
+    echo "spring_boot_parent=${BOOT_PARENT_VERSION:-unknown}"
+    echo "javax_import_occurrences=$JAVA_FILES_WITH_JAVAX"
+  } > "$REPORT_FILE"
+  echo "[upgrade-precheck] report written: $REPORT_FILE"
+fi
+
+if [[ "$STRICT_MODE" -eq 1 && "$STRICT_FAILED" -eq 1 ]]; then
+  echo "[upgrade-precheck] strict check failed"
+  exit 1
+fi
 
 echo "[upgrade-precheck] done"
