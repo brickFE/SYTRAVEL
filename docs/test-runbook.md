@@ -128,3 +128,4 @@ CI 严格模式（用于门禁失败）：
 
 - 作为 artifact `upgrade-precheck-report` 上传
 - 同步写入 GitHub Actions Job Summary，便于在 PR 页面快速查看
+- 基于报告自动生成 `upgrade-execution-checklist` artifact（用于升级分工执行）

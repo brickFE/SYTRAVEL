@@ -32,6 +32,17 @@ jobs:
           name: upgrade-precheck-report
           path: build/upgrade-precheck-report.txt
 
+      - name: Build upgrade execution checklist
+        if: always()
+        run: ./scripts/upgrade-build-checklist.sh build/upgrade-precheck-report.txt build/upgrade-execution-checklist.md
+
+      - name: Upload upgrade execution checklist
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: upgrade-execution-checklist
+          path: build/upgrade-execution-checklist.md
+
       - name: Publish upgrade precheck summary
         if: always()
         run: |
@@ -43,6 +54,9 @@ jobs:
           else
             echo "- report not found" >> "$GITHUB_STEP_SUMMARY"
           fi
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Upgrade execution checklist artifact" >> "$GITHUB_STEP_SUMMARY"
+          echo "- artifact: \`upgrade-execution-checklist\`" >> "$GITHUB_STEP_SUMMARY"
 
   unit-and-validation-tests:
     needs: upgrade-readiness-precheck
