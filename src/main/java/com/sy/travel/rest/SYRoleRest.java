@@ -2,7 +2,6 @@ package com.sy.travel.rest;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -69,8 +68,7 @@ public class SYRoleRest {
 	 * @return
 	 */
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
-	public AjaxResult<String> delete(@RequestParam("id") @Min(1) int id, @RequestParam("operator") @NotBlank String operator,
-			HttpServletRequest request) {
+	public AjaxResult<String> delete(@RequestParam("id") @Min(1) int id, @RequestParam("operator") @NotBlank String operator) {
 		return syRoleService.delete(id, operator);
 	}
 
