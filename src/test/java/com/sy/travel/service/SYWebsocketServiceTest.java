@@ -2,15 +2,26 @@ package com.sy.travel.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+
+import javax.websocket.Session;
 
 import com.sy.travel.common.AjaxResult;
 
@@ -49,5 +60,52 @@ public class SYWebsocketServiceTest {
 		assertEquals(projectDocs, result.getData().get("project"));
 		assertTrue(result.getData().get("team") instanceof List);
 		assertTrue(result.getData().get("product") instanceof List);
+	}
+
+	@Test
+	public void onCloseShouldCancelTaskAndShutdownScheduler() throws Exception {
+		SYWebsocketService service = new SYWebsocketService();
+		ScheduledFuture<?> future = mock(ScheduledFuture.class);
+		ScheduledExecutorService executorService = mock(ScheduledExecutorService.class);
+		setField(service, "monitorTask", future);
+		setField(service, "scheduledService", executorService);
+
+		service.onClose(null, null);
+
+		verify(future).cancel(true);
+		verify(executorService).shutdownNow();
+	}
+
+	@Test
+	public void onMessageShouldCancelTaskWhenSessionClosed() throws Exception {
+		SYWebsocketService service = new SYWebsocketService();
+		ScheduledExecutorService executorService = mock(ScheduledExecutorService.class);
+		ScheduledFuture<?> previousTask = mock(ScheduledFuture.class);
+		ScheduledFuture<?> newTask = mock(ScheduledFuture.class);
+		Session session = mock(Session.class);
+
+		when(session.isOpen()).thenReturn(false);
+		when(executorService.scheduleAtFixedRate(org.mockito.ArgumentMatchers.any(Runnable.class), anyLong(), anyLong(),
+				eq(TimeUnit.MILLISECONDS))).thenReturn(newTask);
+
+		setField(service, "scheduledService", executorService);
+		setField(service, "monitorTask", previousTask);
+
+		service.onMessage("1000", session);
+
+		verify(previousTask).cancel(true);
+
+		ArgumentCaptor<Runnable> captor = ArgumentCaptor.forClass(Runnable.class);
+		verify(executorService).scheduleAtFixedRate(captor.capture(), eq(0L), eq(1000L), eq(TimeUnit.MILLISECONDS));
+		captor.getValue().run();
+
+		verify(newTask).cancel(true);
+		verify(session, never()).getBasicRemote();
+	}
+
+	private void setField(Object target, String fieldName, Object value) throws Exception {
+		Field field = target.getClass().getDeclaredField(fieldName);
+		field.setAccessible(true);
+		field.set(target, value);
 	}
 }

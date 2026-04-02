@@ -44,26 +44,31 @@ public class SYWebsocketService {
 	}
 	@OnOpen
 	public void onOpen(Session session){
-		scheduledService =  Executors.newSingleThreadScheduledExecutor();
+		if (scheduledService == null || scheduledService.isShutdown()) {
+			scheduledService = Executors.newSingleThreadScheduledExecutor();
+		}
 	}
 	
 	@OnMessage
 	public void onMessage(String message, Session session) {
-		if (scheduledService == null) {
+		if (scheduledService == null || scheduledService.isShutdown()) {
 			scheduledService = Executors.newSingleThreadScheduledExecutor();
 		}
-		if (monitorTask != null && !monitorTask.isCancelled()) {
-			monitorTask.cancel(true);
-		}
+		cancelMonitorTask();
 		int intervalMillis = resolveIntervalMillis(message);
 		monitorTask = scheduledService.scheduleAtFixedRate(new Runnable() {
 			@Override
 			public void run() {
+				if (session == null || !session.isOpen()) {
+					cancelMonitorTask();
+					return;
+				}
 				try {
 					Gson gson = new Gson();
 					session.getBasicRemote().sendText(gson.toJson(getMonitor()));
-				} catch (IOException e) {
+				} catch (IOException | IllegalStateException e) {
 					LOGGER.warn("websocket monitor push failed", e);
+					cancelMonitorTask();
 				}
 			}
 		}, 0, intervalMillis, TimeUnit.MILLISECONDS);
@@ -71,21 +76,24 @@ public class SYWebsocketService {
 	
 	@OnClose
 	public void onClose(Session session, CloseReason closeReason) {
-		if (monitorTask != null) {
-			monitorTask.cancel(true);
-		}
-		if (scheduledService != null) {
-			scheduledService.shutdownNow();
-		}
+		stopMonitor();
 	}
 	
 	@OnError
 	public void onError(Throwable t) {
-		if (monitorTask != null) {
-			monitorTask.cancel(true);
-		}
+		stopMonitor();
+	}
+
+	private void stopMonitor() {
+		cancelMonitorTask();
 		if (scheduledService != null) {
 			scheduledService.shutdownNow();
+		}
+	}
+
+	private void cancelMonitorTask() {
+		if (monitorTask != null) {
+			monitorTask.cancel(true);
 		}
 	}
 
