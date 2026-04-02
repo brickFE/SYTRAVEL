@@ -63,6 +63,50 @@ public class SYWebsocketServiceTest {
 	}
 
 	@Test
+	public void getMonitorShouldReturnEmptyListsWhenServicesUnavailable() throws Exception {
+		SYWebsocketService service = new SYWebsocketService();
+		Object oldProjectService = getStaticField(SYWebsocketService.class, "sYProjectService");
+		Object oldTeamService = getStaticField(SYWebsocketService.class, "syTeamService");
+		Object oldProductService = getStaticField(SYWebsocketService.class, "syProductService");
+		try {
+			setStaticField(SYWebsocketService.class, "sYProjectService", null);
+			setStaticField(SYWebsocketService.class, "syTeamService", null);
+			setStaticField(SYWebsocketService.class, "syProductService", null);
+
+			AjaxResult<Map<String, Object>> result = service.getMonitor();
+			assertTrue(result.getData().get("project") instanceof List);
+			assertTrue(((List<?>) result.getData().get("project")).isEmpty());
+			assertTrue(result.getData().get("team") instanceof List);
+			assertTrue(((List<?>) result.getData().get("team")).isEmpty());
+			assertTrue(result.getData().get("product") instanceof List);
+			assertTrue(((List<?>) result.getData().get("product")).isEmpty());
+		} finally {
+			setStaticField(SYWebsocketService.class, "sYProjectService", oldProjectService);
+			setStaticField(SYWebsocketService.class, "syTeamService", oldTeamService);
+			setStaticField(SYWebsocketService.class, "syProductService", oldProductService);
+		}
+	}
+
+	@Test
+	public void getMonitorShouldReturnEmptyListsWhenDocumentsMissing() {
+		SYProjectService projectService = mock(SYProjectService.class);
+		SYTeamService teamService = mock(SYTeamService.class);
+		SYProductService productService = mock(SYProductService.class);
+
+		when(projectService.queryAll("", 1, Integer.MAX_VALUE)).thenReturn(new HashMap<String, Object>());
+		when(teamService.findAll("", 1, Integer.MAX_VALUE)).thenReturn(new HashMap<String, Object>());
+		when(productService.findAll("", 1, Integer.MAX_VALUE)).thenReturn(new HashMap<String, Object>());
+
+		SYWebsocketService service = new SYWebsocketService();
+		service.get(projectService, teamService, productService);
+
+		AjaxResult<Map<String, Object>> result = service.getMonitor();
+		assertTrue(((List<?>) result.getData().get("project")).isEmpty());
+		assertTrue(((List<?>) result.getData().get("team")).isEmpty());
+		assertTrue(((List<?>) result.getData().get("product")).isEmpty());
+	}
+
+	@Test
 	public void onCloseShouldCancelTaskAndShutdownScheduler() throws Exception {
 		SYWebsocketService service = new SYWebsocketService();
 		ScheduledFuture<?> future = mock(ScheduledFuture.class);
@@ -107,5 +151,17 @@ public class SYWebsocketServiceTest {
 		Field field = target.getClass().getDeclaredField(fieldName);
 		field.setAccessible(true);
 		field.set(target, value);
+	}
+
+	private void setStaticField(Class<?> type, String fieldName, Object value) throws Exception {
+		Field field = type.getDeclaredField(fieldName);
+		field.setAccessible(true);
+		field.set(null, value);
+	}
+
+	private Object getStaticField(Class<?> type, String fieldName) throws Exception {
+		Field field = type.getDeclaredField(fieldName);
+		field.setAccessible(true);
+		return field.get(null);
 	}
 }

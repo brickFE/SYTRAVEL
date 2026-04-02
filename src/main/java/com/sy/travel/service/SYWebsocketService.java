@@ -108,24 +108,38 @@ public class SYWebsocketService {
 	
 	public AjaxResult<Map<String, Object>> getMonitor(){
 		Map<String,Object> resultMap = new HashMap<>();
-		Map<String,Object> projectMap = SYWebsocketService.sYProjectService.queryAll("",1, Integer.MAX_VALUE);
-		if(projectMap == null) {
+		if (SYWebsocketService.sYProjectService == null) {
+			LOGGER.warn("project service is unavailable, fallback to empty monitor data");
 			resultMap.put("project", new ArrayList<>());
 		} else {
-			resultMap.put("project", (List<Map<String,Object>>)projectMap.get("documents"));
+			Map<String,Object> projectMap = SYWebsocketService.sYProjectService.queryAll("",1, Integer.MAX_VALUE);
+			resultMap.put("project", extractDocuments(projectMap));
 		}
-		Map<String,Object> teamMap = SYWebsocketService.syTeamService.findAll("",1,Integer.MAX_VALUE);
-		if(teamMap == null) {
+		if (SYWebsocketService.syTeamService == null) {
+			LOGGER.warn("team service is unavailable, fallback to empty monitor data");
 			resultMap.put("team", new ArrayList<>());
 		} else {
-			resultMap.put("team", (List<Map<String,Object>>)teamMap.get("documents"));
+			Map<String,Object> teamMap = SYWebsocketService.syTeamService.findAll("",1,Integer.MAX_VALUE);
+			resultMap.put("team", extractDocuments(teamMap));
 		}
-		Map<String,Object> productMap = SYWebsocketService.syProductService.findAll("", 1, Integer.MAX_VALUE);
-		if(productMap == null) {
+		if (SYWebsocketService.syProductService == null) {
+			LOGGER.warn("product service is unavailable, fallback to empty monitor data");
 			resultMap.put("product", new ArrayList<>());
 		} else {
-			resultMap.put("product", (List<Map<String,Object>>)productMap.get("documents"));
+			Map<String,Object> productMap = SYWebsocketService.syProductService.findAll("", 1, Integer.MAX_VALUE);
+			resultMap.put("product", extractDocuments(productMap));
 		}
 		return AjaxResult.success(resultMap);
+	}
+
+	private List<Map<String, Object>> extractDocuments(Map<String, Object> source) {
+		if (source == null) {
+			return new ArrayList<>();
+		}
+		Object documents = source.get("documents");
+		if (documents instanceof List) {
+			return (List<Map<String, Object>>) documents;
+		}
+		return new ArrayList<>();
 	}
 }
