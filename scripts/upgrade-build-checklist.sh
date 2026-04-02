@@ -2,13 +2,21 @@
 set -euo pipefail
 
 if [[ $# -lt 2 ]]; then
-  echo "Usage: $0 <precheck-report-file> <output-markdown-file> [owners-map-file]"
+  echo "Usage: $0 <precheck-report-file> <output-markdown-file> [owners-map-file] [--fail-on-unmapped]"
   exit 2
 fi
 
 REPORT_FILE="$1"
 OUT_FILE="$2"
-OWNERS_MAP_FILE="${3:-config/upgrade-owners.map}"
+OWNERS_MAP_FILE="config/upgrade-owners.map"
+FAIL_ON_UNMAPPED=0
+for arg in "${@:3}"; do
+  if [[ "$arg" == "--fail-on-unmapped" ]]; then
+    FAIL_ON_UNMAPPED=1
+  else
+    OWNERS_MAP_FILE="$arg"
+  fi
+done
 
 if [[ ! -f "$REPORT_FILE" ]]; then
   echo "[upgrade-build-checklist] ERROR: report file not found: $REPORT_FILE"
@@ -57,6 +65,7 @@ BOOT_PARENT="$(get_value spring_boot_parent)"
 JAVAX_COUNT="$(get_value javax_import_occurrences)"
 
 mkdir -p "$(dirname "$OUT_FILE")"
+UNMAPPED_COUNT=0
 
 {
   echo "# Upgrade Execution Checklist (Auto-generated)"
@@ -81,6 +90,9 @@ mkdir -p "$(dirname "$OUT_FILE")"
       hotspot_count="${hotspot##*:}"
       risk_level="$(risk_level_for_hotspot "$hotspot_path")"
       hotspot_owner="$(owner_for_hotspot "$hotspot_path")"
+      if [[ "$hotspot_owner" == "TBD" ]]; then
+        UNMAPPED_COUNT=$((UNMAPPED_COUNT + 1))
+      fi
       echo "- [ ] hotspot ${i}: \`${hotspot_path}\` (imports: ${hotspot_count}, risk: ${risk_level}, owner: ${hotspot_owner})"
     fi
   done
@@ -90,6 +102,13 @@ mkdir -p "$(dirname "$OUT_FILE")"
   echo "- [ ] Run smoke gate: \`./scripts/test-gate.sh smoke\`"
   echo "- [ ] Run validation gate: \`./scripts/test-gate.sh validation\`"
   echo "- [ ] Run full gate: \`./scripts/test-gate.sh full\`"
+  echo
+  echo "## Meta"
+  echo "- unmapped owners: \`${UNMAPPED_COUNT}\`"
 } > "$OUT_FILE"
 
 echo "[upgrade-build-checklist] wrote: $OUT_FILE"
+if [[ "$FAIL_ON_UNMAPPED" -eq 1 && "$UNMAPPED_COUNT" -gt 0 ]]; then
+  echo "[upgrade-build-checklist] ERROR: found ${UNMAPPED_COUNT} hotspot(s) without owner mapping"
+  exit 1
+fi
