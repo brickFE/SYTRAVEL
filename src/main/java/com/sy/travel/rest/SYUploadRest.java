@@ -18,14 +18,14 @@ public class SYUploadRest {
 	@RequestMapping(value="/file", method=RequestMethod.POST)
 	public AjaxResult<String> upload(MultipartFile file) {
 		if(file.isEmpty()) {
-			return new AjaxResult<String>(500, "failed", "file is null");
+			return AjaxResult.failed(500, "file is null");
 		}
 		try {
 			FileUtils.writeByteArrayToFile(new File("D:\\upload\\" + file.getOriginalFilename()), file.getBytes());
-			return new AjaxResult<String>(200, "success", "ok");
+			return AjaxResult.success("ok");
 		} catch (IOException e) {
 			e.printStackTrace();
-			return new AjaxResult<String>(500, "failed", "failed");
+			return AjaxResult.failed(500, "failed");
 		}
 	}
 }

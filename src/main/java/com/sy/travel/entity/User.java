@@ -1,14 +1,14 @@
 package com.sy.travel.entity;
 
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 
 import com.sy.travel.common.SY;
+import com.sy.travel.common.PasswordSupport;
 
 /**
  * 用户信息
@@ -52,15 +52,14 @@ public class User implements SY{
 	}
 
 	public String getPassword() {
-		byte[] decode = Base64.getDecoder().decode(this.password);
-		String pass = new String(decode);
-		return pass.substring(pass.indexOf(":") + 1);
+		if (PasswordSupport.isBcryptHash(this.password)) {
+			return this.password;
+		}
+		return PasswordSupport.legacyDecode(this.password);
 	}
 
-	private String setPassword(String username, String password) {
-		String pwd = username + ":" + password;
-		byte[] encode = Base64.getEncoder().encode(pwd.getBytes());
-		return new String(encode);
+	public String getEncodedPassword() {
+		return this.password;
 	}
 
 	public void setPassword(String password) {
@@ -92,7 +91,7 @@ public class User implements SY{
 	public Map<String, Object> toMap() {
 		Map<String, Object> m = new HashMap<>();
 		m.put("username", username);
-		m.put("password", setPassword(username, password));
+		m.put("password", password);
 		m.put("remark", remark);
 		m.put("permission", permission);
 		m.put("id", id);

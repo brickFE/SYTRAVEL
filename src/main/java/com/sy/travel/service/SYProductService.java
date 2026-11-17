@@ -21,8 +21,11 @@ import com.sy.travel.common.Commons;
 import com.sy.travel.common.DateFormat;
 import com.sy.travel.dao.SYClassesRepository;
 import com.sy.travel.dao.SYProductRepository;
-import com.sy.travel.entity.Logger;
+import com.sy.travel.dto.product.ProductCreateRequest;
+import com.sy.travel.dto.product.ProductUpdateRequest;
 import com.sy.travel.entity.Product;
+import com.sy.travel.service.support.OperationResultSupport;
+import com.sy.travel.service.support.PermissionGuard;
 import com.sy.travel.utils.JSON;
 
 /**
@@ -40,6 +43,8 @@ public class SYProductService implements DateFormat{
 	private SYClassesRepository syClassesRepository;
 	@Autowired
 	private SYLoggerService syLoggerService;
+	@Autowired
+	private PermissionGuard permissionGuard;
 
 	/**
 	 * 添加产品信息
@@ -51,6 +56,10 @@ public class SYProductService implements DateFormat{
 		operator = (String) json.get("operator");
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.PRODUCT_ADD);
+		}
 		String code = (String) json.get("code");
 		if(StringUtils.isBlank(code)) {
 			reason = Commons.PRODUCT_ADD_CODE_NOT_NULL;
@@ -126,6 +135,26 @@ public class SYProductService implements DateFormat{
 		}
 		return result(operator, start, reason, "1", Commons.PRODUCT_ADD);
 	}
+
+	public AjaxResult<String> add(ProductCreateRequest request) {
+		JSON json = new JSON();
+		json.put("operator", request.getOperator());
+		json.put("code", request.getCode());
+		json.put("name", request.getName());
+		json.put("teamId", request.getTeamId());
+		json.put("exText", request.getExText());
+		json.put("onlineDate", request.getOnlineDate());
+		json.put("offlineDate", request.getOfflineDate());
+		json.put("classId", request.getClassId());
+		json.put("quantity", request.getQuantity());
+		json.put("minQty", request.getMinQty());
+		json.put("soldQty", request.getSoldQty());
+		json.put("price", request.getPrice());
+		json.put("nights", request.getNights());
+		json.put("status", request.getStatus());
+		json.put("remark", request.getRemark());
+		return add(json, request.getOperator());
+	}
 	
 	/**
 	 * 删除产品信息
@@ -136,6 +165,10 @@ public class SYProductService implements DateFormat{
 	public AjaxResult<String> delete(int id, String operator){
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.PRODUCT_DELETE);
+		}
 		try {
 			syProductRepository.delete(id);
 			return result(operator, start, reason, "1", Commons.PRODUCT_DELETE);
@@ -157,6 +190,10 @@ public class SYProductService implements DateFormat{
 		operator = (String) json.get("operator");
 		Date start = new Date();
 		String reason = "";
+		reason = permissionGuard.requireAdmin(operator);
+		if(StringUtils.isNotBlank(reason)) {
+			return result(operator, start, reason, "0", Commons.PRODUCT_DELETE);
+		}
 		int id = (int) json.get("id");
 		Product product = syProductRepository.findOne(id);
 		if(product == null) {
@@ -192,6 +229,22 @@ public class SYProductService implements DateFormat{
 			return result(operator, start, reason, "0", Commons.PRODUCT_DELETE);
 		}
 		return result(operator, start, reason, "1", Commons.PRODUCT_DELETE);
+	}
+
+	public AjaxResult<String> update(ProductUpdateRequest request){
+		JSON json = new JSON();
+		json.put("operator", request.getOperator());
+		json.put("id", request.getId());
+		json.put("name", request.getName());
+		json.put("exText", request.getExText());
+		json.put("quantity", request.getQuantity());
+		json.put("minQty", request.getMinQty());
+		json.put("soldQty", request.getSoldQty());
+		json.put("price", request.getPrice());
+		json.put("nights", request.getNights());
+		json.put("status", request.getStatus());
+		json.put("remark", request.getRemark());
+		return update(json, request.getOperator());
 	}
 	
 	/**
@@ -307,10 +360,6 @@ public class SYProductService implements DateFormat{
 	 * @return
 	 */
 	private AjaxResult<String> result(String operator, Date start, String reason, String status, String operation) {
-		Logger logger = new Logger(operator, sdf.format(start), sdf.format(new Date()),
-				StringUtils.isBlank(reason) ? operator + operation + ":成功" : operator + operation + "失败原因:" + reason,
-				status, operation);// 记录操作日志
-		syLoggerService.save(logger);
-		return new AjaxResult<String>(200, "1".equals(status) ? "success" : "failed", reason);
+		return OperationResultSupport.build(syLoggerService, operator, start, reason, status, operation);
 	}
 }
